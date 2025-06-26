@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oficina Mecânica - Painel</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <header>
+    <h1>Oficina Mecânica</h1>
+    <nav>
+      <ul class="menu">
+        <li><a href="#" data-section="clientes">Clientes</a></li>
+        <li><a href="#" data-section="funcionarios">Funcionários</a></li>
+        <li><a href="#" data-section="veiculos">Veículos</a></li>
+        <li><a href="#" data-section="servicos">Serviços</a></li>
+        <li><a href="#" data-section="pecas">Peças</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropbtn">Processos</a>
+          <div class="dropdown-content">
+            <a href="#" data-section="ordens">Ordens de Serviço</a>
+            <a href="#" data-section="execucoes">Execuções de Serviço</a>
+            <a href="#" data-section="reservas">Reservas de Peça</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <div id="app">
+      <section class="welcome">
+        <h2>Bem-vindo ao sistema da Oficina Mecânica!</h2>
+        <p>Escolha uma das opções acima para gerenciar os dados do sistema.</p>
+      </section>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2024 Oficina Mecânica</p>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html> 
