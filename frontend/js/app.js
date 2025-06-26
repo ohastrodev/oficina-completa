@@ -1602,9 +1602,9 @@ function renderTabelaServicosPecas(dados) {
     tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
     return;
   }
-  let html = '<table class="tabela-relatorio"><thead><tr><th>Serviço</th><th>Total de Peças Reservadas</th></tr></thead><tbody>';
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Serviço</th><th>Qtd. de Reservas</th></tr></thead><tbody>';
   for (const item of dados) {
-    html += `<tr><td>${item.descricaoServico}</td><td>${item.totalPecas}</td></tr>`;
+    html += `<tr><td>${item.descricaoServico}</td><td>${item.totalReservas}</td></tr>`;
   }
   html += '</tbody></table>';
   tabelaDiv.innerHTML = html;
@@ -1619,8 +1619,8 @@ function renderGraficoServicosPecas(dados) {
     data: {
       labels: dados.map(d => d.descricaoServico),
       datasets: [{
-        label: 'Total de Peças Reservadas',
-        data: dados.map(d => d.totalPecas),
+        label: 'Qtd. de Reservas',
+        data: dados.map(d => d.totalReservas),
         backgroundColor: 'rgba(255, 205, 0, 0.7)',
         borderColor: 'rgba(0,0,0,0.8)',
         borderWidth: 1
