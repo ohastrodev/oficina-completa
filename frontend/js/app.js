@@ -709,7 +709,153 @@ function renderOrdensSection() {
 }
 
 function ordensController() {
-  // Implementação CRUD virá em seguida
+  const API_URL = `${BASE_URL}/aberturaservico`;
+  const tableBody = document.querySelector('#ordens-table tbody');
+  const novoBtn = document.getElementById('nova-ordem');
+
+  async function getSelectOptions() {
+    // Carregar opções de funcionários, veículos e serviços
+    const [funcs, veics, servs] = await Promise.all([
+      fetch(`${BASE_URL}/funcionarios`).then(r => r.json()),
+      fetch(`${BASE_URL}/veiculos`).then(r => r.json()),
+      fetch(`${BASE_URL}/servicos`).then(r => r.json())
+    ]);
+    return { funcs, veics, servs };
+  }
+
+  function getFormHtml(ordem = {}, options = {}) {
+    const { funcs = [], veics = [], servs = [] } = options;
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2>${ordem.id ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}</h2>
+      <form id="ordem-form">
+        <input type="hidden" id="ordem-id" value="${ordem.id || ''}">
+        <div><label>Data:</label><input type="date" id="ordem-data" value="${ordem.data ? ordem.data.substring(0,10) : ''}" required></div>
+        <div><label>Funcionário:</label><select id="ordem-funcionario" required>
+          <option value="">Selecione</option>
+          ${funcs.map(f => `<option value="${f.id}" ${ordem.funcionario_id==f.id?'selected':''}>${f.nome}</option>`).join('')}
+        </select></div>
+        <div><label>Veículo:</label><select id="ordem-veiculo" required>
+          <option value="">Selecione</option>
+          ${veics.map(v => `<option value="${v.id}" ${ordem.veiculo_id==v.id?'selected':''}>${v.marca} ${v.modelo} (${v.placa})</option>`).join('')}
+        </select></div>
+        <div><label>Serviço:</label><select id="ordem-servico" required>
+          <option value="">Selecione</option>
+          ${servs.map(s => `<option value="${s.id}" ${ordem.servico_id==s.id?'selected':''}>${s.descricao}</option>`).join('')}
+        </select></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-ordem">Cancelar</button>
+      </form>
+    `;
+  }
+
+  function renderizarTabela(ordens) {
+    tableBody.innerHTML = '';
+    ordens.forEach(ordem => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ordem.id}</td>
+        <td>${ordem.data ? ordem.data.substring(0,10) : ''}</td>
+        <td>${ordem.funcionario?.nome || ordem.funcionario_id || ''}</td>
+        <td>${ordem.veiculo ? ordem.veiculo.marca + ' ' + ordem.veiculo.modelo + ' (' + ordem.veiculo.placa + ')' : ordem.veiculo_id || ''}</td>
+        <td>${ordem.servico?.descricao || ordem.servico_id || ''}</td>
+        <td>
+          <button class="editar-btn" data-id="${ordem.id}">Editar</button>
+          <button class="excluir-btn" data-id="${ordem.id}">Excluir</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+    document.querySelectorAll('.editar-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
+          if (!resp.ok) throw new Error();
+          const ordem = await resp.json();
+          const options = await getSelectOptions();
+          openModal(getFormHtml(ordem, options));
+          setupFormEvents();
+        } catch {
+          alert('Erro ao buscar ordem.');
+        }
+      });
+    });
+    document.querySelectorAll('.excluir-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Tem certeza que deseja excluir esta ordem?')) return;
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
+          if (!resp.ok) throw new Error();
+          carregarOrdens();
+        } catch {
+          alert('Erro ao excluir ordem.');
+        }
+      });
+    });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('ordem-form');
+    const cancelarBtn = document.getElementById('cancelar-ordem');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('ordem-id').value;
+      const ordem = {
+        data: document.getElementById('ordem-data').value,
+        funcionario_id: document.getElementById('ordem-funcionario').value,
+        veiculo_id: document.getElementById('ordem-veiculo').value,
+        servico_id: document.getElementById('ordem-servico').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ordem)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ordem)
+          });
+        }
+        if (!resp.ok) {
+          const erro = await resp.json();
+          alert(erro.error || 'Erro ao salvar ordem.');
+          return;
+        }
+        carregarOrdens();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar ordem.');
+      }
+    });
+  }
+
+  async function carregarOrdens() {
+    try {
+      const resp = await fetch(API_URL);
+      const ordens = await resp.json();
+      renderizarTabela(ordens);
+    } catch (err) {
+      alert('Erro ao carregar ordens.');
+    }
+  }
+
+  novoBtn.addEventListener('click', async () => {
+    const options = await getSelectOptions();
+    openModal(getFormHtml({}, options));
+    setupFormEvents();
+  });
+
+  carregarOrdens();
 }
 
 // CRUD Execução de Serviço
@@ -725,6 +871,9 @@ function renderExecucoesSection() {
             <th>Ordem de Serviço</th>
             <th>Funcionário</th>
             <th>Data Execução</th>
+            <th>Valor</th>
+            <th>Valor c/ Desconto</th>
+            <th>Forma Pagamento</th>
             <th>Status</th>
             <th>Ações</th>
           </tr>
@@ -737,7 +886,160 @@ function renderExecucoesSection() {
 }
 
 function execucoesController() {
-  // Implementação CRUD virá em seguida
+  const API_URL = `${BASE_URL}/ExecucaoServico`;
+  const tableBody = document.querySelector('#execucoes-table tbody');
+  const novoBtn = document.getElementById('nova-execucao');
+
+  async function getSelectOptions() {
+    // Carregar opções de ordens, formas de pagamento e funcionários
+    const [ordens, formas, funcs] = await Promise.all([
+      fetch(`${BASE_URL}/aberturaservico`).then(r => r.json()),
+      fetch(`${BASE_URL}/formaPagamento`).then(r => r.json()),
+      fetch(`${BASE_URL}/funcionarios`).then(r => r.json())
+    ]);
+    return { ordens, formas, funcs };
+  }
+
+  function getFormHtml(exec = {}, options = {}) {
+    const { ordens = [], formas = [], funcs = [] } = options;
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2>${exec.id ? 'Editar Execução de Serviço' : 'Nova Execução de Serviço'}</h2>
+      <form id="execucao-form">
+        <input type="hidden" id="execucao-id" value="${exec.id || ''}">
+        <div><label>Ordem de Serviço:</label><select id="exec-ordem" required>
+          <option value="">Selecione</option>
+          ${ordens.map(o => `<option value="${o.id}" ${exec.abertura_servico_id==o.id?'selected':''}>${o.id} - ${o.veiculo?.placa || ''} - ${o.servico?.descricao || ''}</option>`).join('')}
+        </select></div>
+        <div><label>Funcionário:</label><select id="exec-funcionario" required>
+          <option value="">Selecione</option>
+          ${funcs.map(f => `<option value="${f.id}" ${exec.funcionario_id==f.id?'selected':''}>${f.nome}</option>`).join('')}
+        </select></div>
+        <div><label>Data Execução:</label><input type="date" id="exec-data" value="${exec.dataFinalizacao ? exec.dataFinalizacao.substring(0,10) : ''}" required></div>
+        <div><label>Valor:</label><input type="number" step="0.01" id="exec-valor" value="${exec.valor || ''}" required></div>
+        <div><label>Valor c/ Desconto:</label><input type="number" step="0.01" id="exec-valor-desc" value="${exec.valorComDesconto || ''}"></div>
+        <div><label>Forma Pagamento:</label><select id="exec-forma" required>
+          <option value="">Selecione</option>
+          ${formas.map(f => `<option value="${f.id}" ${exec.forma_pagamento_id==f.id?'selected':''}>${f.descricao}</option>`).join('')}
+        </select></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-exec">Cancelar</button>
+      </form>
+    `;
+  }
+
+  function renderizarTabela(execList) {
+    tableBody.innerHTML = '';
+    execList.forEach(exec => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${exec.id}</td>
+        <td>${exec.abertura_servico_id}</td>
+        <td>${exec.funcionario?.nome || exec.funcionario_id || ''}</td>
+        <td>${exec.dataFinalizacao ? exec.dataFinalizacao.substring(0,10) : ''}</td>
+        <td>${exec.valor}</td>
+        <td>${exec.valorComDesconto || ''}</td>
+        <td>${exec.formaPagamento?.descricao || exec.forma_pagamento_id || ''}</td>
+        <td>${exec.status || ''}</td>
+        <td>
+          <button class="editar-btn" data-id="${exec.id}">Editar</button>
+          <button class="excluir-btn" data-id="${exec.id}">Excluir</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+    document.querySelectorAll('.editar-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
+          if (!resp.ok) throw new Error();
+          const exec = await resp.json();
+          const options = await getSelectOptions();
+          openModal(getFormHtml(exec, options));
+          setupFormEvents();
+        } catch {
+          alert('Erro ao buscar execução.');
+        }
+      });
+    });
+    document.querySelectorAll('.excluir-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Tem certeza que deseja excluir esta execução?')) return;
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
+          if (!resp.ok) throw new Error();
+          carregarExecucoes();
+        } catch {
+          alert('Erro ao excluir execução.');
+        }
+      });
+    });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('execucao-form');
+    const cancelarBtn = document.getElementById('cancelar-exec');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('execucao-id').value;
+      const exec = {
+        abertura_servico_id: document.getElementById('exec-ordem').value,
+        funcionario_id: document.getElementById('exec-funcionario').value,
+        dataFinalizacao: document.getElementById('exec-data').value,
+        valor: document.getElementById('exec-valor').value,
+        valorComDesconto: document.getElementById('exec-valor-desc').value,
+        forma_pagamento_id: document.getElementById('exec-forma').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(exec)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(exec)
+          });
+        }
+        if (!resp.ok) {
+          const erro = await resp.json();
+          alert(erro.error || 'Erro ao salvar execução.');
+          return;
+        }
+        carregarExecucoes();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar execução.');
+      }
+    });
+  }
+
+  async function carregarExecucoes() {
+    try {
+      const resp = await fetch(API_URL);
+      const execList = await resp.json();
+      renderizarTabela(execList);
+    } catch (err) {
+      alert('Erro ao carregar execuções.');
+    }
+  }
+
+  novoBtn.addEventListener('click', async () => {
+    const options = await getSelectOptions();
+    openModal(getFormHtml({}, options));
+    setupFormEvents();
+  });
+
+  carregarExecucoes();
 }
 
 // CRUD Reserva de Peça
@@ -765,7 +1067,230 @@ function renderReservasSection() {
 }
 
 function reservasController() {
-  // Implementação CRUD virá em seguida
+  const API_URL = `${BASE_URL}/reservas-peca`;
+  const tableBody = document.querySelector('#reservas-table tbody');
+  const novoBtn = document.getElementById('nova-reserva');
+
+  let servicosCache = [];
+
+  async function carregarServicos() {
+    try {
+      const resp = await fetch(`${BASE_URL}/servicos`);
+      servicosCache = await resp.json();
+    } catch (err) {
+      servicosCache = [];
+    }
+  }
+
+  async function getReservasPorOrdem(ordemId) {
+    if (!ordemId) return [];
+    const resp = await fetch(`${API_URL}`);
+    const reservas = await resp.json();
+    return reservas.filter(r => r.abertura_servico_id == ordemId);
+  }
+
+  function getFormHtml(reserva = {}, options = {}, reservasOrdem = []) {
+    const { pecas = [], ordens = [] } = options;
+    // Mapeia reservas já feitas para a ordem
+    const reservasPorPeca = {};
+    reservasOrdem.forEach(r => {
+      reservasPorPeca[r.peca_id] = (reservasPorPeca[r.peca_id] || 0) + Number(r.quantidade);
+    });
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2>${reserva.id ? 'Editar Reserva de Peça' : 'Nova Reserva de Peça'}</h2>
+      <form id="reserva-form">
+        <input type="hidden" id="reserva-id" value="${reserva.id || ''}">
+        <div><label>Ordem de Serviço:</label><select id="reserva-ordem" required>
+          <option value="">Selecione</option>
+          ${ordens.map(o => `<option value="${o.id}" ${reserva.abertura_servico_id==o.id?'selected':''}>${o.id} - ${o.veiculo?.placa || ''} - ${o.servico?.descricao || ''}</option>`).join('')}
+        </select></div>
+        <div><label>Peça:</label><select id="reserva-peca" required>
+          <option value="">Selecione</option>
+          ${pecas.map(p => {
+            const reservado = reservasPorPeca[p.id] || 0;
+            const disponivel = Math.max(0, p.estoque - reservado + (reserva.peca_id==p.id ? Number(reserva.quantidade||0) : 0));
+            return `<option value="${p.id}" data-disponivel="${disponivel}" ${reserva.peca_id==p.id?'selected':''}>${p.nome} (Disponível: ${disponivel})</option>`;
+          }).join('')}
+        </select></div>
+        <div><label>Quantidade:</label><input type="number" id="reserva-quantidade" min="1" value="${reserva.quantidade || 1}" required></div>
+        <small id="reserva-limite-msg"></small>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-reserva">Cancelar</button>
+      </form>
+    `;
+  }
+
+  function setupFormEvents(reservasOrdem = []) {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('reserva-form');
+    const cancelarBtn = document.getElementById('cancelar-reserva');
+    const closeBtn = document.querySelector('.modal-close');
+    const ordemSelect = document.getElementById('reserva-ordem');
+    const pecaSelect = document.getElementById('reserva-peca');
+    const qtdInput = document.getElementById('reserva-quantidade');
+    const msg = document.getElementById('reserva-limite-msg');
+
+    async function atualizarLimite() {
+      const ordemId = ordemSelect.value;
+      const pecaId = pecaSelect.value;
+      if (!ordemId || !pecaId) {
+        qtdInput.max = 1;
+        msg.textContent = '';
+        return;
+      }
+      // Soma já reservada para essa peça nessa ordem (exceto a reserva atual, se for edição)
+      let reservado = 0;
+      reservasOrdem.forEach(r => {
+        if (r.peca_id == pecaId && (!form.reservaId || r.id != form.reservaId.value)) {
+          reservado += Number(r.quantidade);
+        }
+      });
+      // Estoque disponível
+      const opt = pecaSelect.querySelector(`option[value="${pecaId}"]`);
+      const disponivel = Number(opt?.dataset?.disponivel || 0);
+      // Limite máximo: não pode passar de 5 no total para a ordem, nem do estoque
+      const maxQtd = Math.min(5 - reservado, disponivel);
+      qtdInput.max = maxQtd > 0 ? maxQtd : 1;
+      msg.textContent = `Máximo permitido: ${qtdInput.max}`;
+      if (Number(qtdInput.value) > qtdInput.max) qtdInput.value = qtdInput.max;
+    }
+
+    ordemSelect.addEventListener('change', async () => {
+      // Ao trocar ordem, recarregar reservas e atualizar peças disponíveis
+      const ordemId = ordemSelect.value;
+      const options = await getSelectOptions();
+      const reservasOrdemAtual = await getReservasPorOrdem(ordemId);
+      openModal(getFormHtml({}, options, reservasOrdemAtual));
+      setupFormEvents(reservasOrdemAtual);
+    });
+    pecaSelect.addEventListener('change', atualizarLimite);
+    qtdInput.addEventListener('input', atualizarLimite);
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    atualizarLimite();
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('reserva-id').value;
+      const reserva = {
+        abertura_servico_id: document.getElementById('reserva-ordem').value,
+        peca_id: document.getElementById('reserva-peca').value,
+        quantidade: document.getElementById('reserva-quantidade').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reserva)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reserva)
+          });
+        }
+        if (!resp.ok) {
+          const erro = await resp.json();
+          alert(erro.error || 'Erro ao salvar reserva.');
+          return;
+        }
+        carregarReservas();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar reserva.');
+      }
+    });
+  }
+
+  async function carregarReservas() {
+    try {
+      await carregarServicos();
+      const resp = await fetch(API_URL);
+      const reservas = await resp.json();
+      console.log('RESERVAS CARREGADAS:', reservas);
+      renderizarTabela(reservas);
+    } catch (err) {
+      console.error('ERRO AO CARREGAR RESERVAS:', err);
+      alert('Erro ao carregar reservas.');
+    }
+  }
+
+  function renderizarTabela(reservas) {
+    if (!Array.isArray(reservas)) {
+      console.error('RESERVAS NÃO É ARRAY:', reservas);
+      alert('Erro ao processar reservas.');
+      return;
+    }
+    tableBody.innerHTML = '';
+    reservas.forEach(reserva => {
+      // Nome da peça
+      const nomePeca = reserva.peca?.nome || reserva.peca_id || '';
+      // Ordem de serviço (ID)
+      const ordemId = reserva.abertura_servico_id || reserva.servico?.id || '';
+      // Descrição do serviço (busca pelo ID na lista de serviços)
+      let descServico = '';
+      const servicoId = reserva.servico?.servico_id || reserva.servico_id;
+      if (servicoId && servicosCache.length) {
+        const serv = servicosCache.find(s => s.id == servicoId);
+        if (serv) descServico = serv.descricao;
+      }
+      // Linha da tabela
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${reserva.id}</td>
+        <td>${nomePeca}</td>
+        <td>${ordemId}${descServico ? ' (' + descServico + ')' : ''}</td>
+        <td>${reserva.quantidade}</td>
+        <td>${reserva.createdAt ? reserva.createdAt.substring(0,10) : ''}</td>
+        <td>
+          <button class="editar-btn" data-id="${reserva.id}">Editar</button>
+          <button class="excluir-btn" data-id="${reserva.id}">Excluir</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+    document.querySelectorAll('.editar-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
+          if (!resp.ok) throw new Error();
+          const reserva = await resp.json();
+          const options = await getSelectOptions();
+          const reservasOrdem = await getReservasPorOrdem(reserva.abertura_servico_id);
+          openModal(getFormHtml(reserva, options, reservasOrdem));
+          setupFormEvents(reservasOrdem);
+        } catch (e) {
+          console.error('ERRO AO BUSCAR RESERVA:', e);
+          alert('Erro ao buscar reserva.');
+        }
+      });
+    });
+    document.querySelectorAll('.excluir-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+        try {
+          const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
+          if (!resp.ok) throw new Error();
+          carregarReservas();
+        } catch (e) {
+          console.error('ERRO AO EXCLUIR RESERVA:', e);
+          alert('Erro ao excluir reserva.');
+        }
+      });
+    });
+  }
+
+  novoBtn.addEventListener('click', async () => {
+    const options = await getSelectOptions();
+    openModal(getFormHtml({}, options, []));
+    setupFormEvents([]);
+  });
+
+  carregarReservas();
 }
 
 // Inicialização
