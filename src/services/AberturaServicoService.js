@@ -16,6 +16,9 @@ class AberturaServicoService {
   }
 
   static async findByPk(req) {
+    if (!req || !req.params || !req.params.id) {
+      throw 'ID da ordem de serviço não informado!';
+    }
     const { id } = req.params;
     return await AberturaServico.findByPk(id, {
       include: [
