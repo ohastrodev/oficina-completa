@@ -492,33 +492,33 @@ function servicosController() {
     const closeBtn = document.querySelector('.modal-close');
     cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
     closeBtn.addEventListener('click', closeModal);
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
       const id = document.getElementById('servico-id').value;
       const servico = {
         descricao: document.getElementById('serv-descricao').value,
         maoObra: document.getElementById('serv-maoObra').value,
         categoria: document.getElementById('serv-categoria').value
       };
-      try {
-        let resp;
-        if (id) {
-          resp = await fetch(`${API_URL}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+    try {
+      let resp;
+      if (id) {
+        resp = await fetch(`${API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(servico)
-          });
-        } else {
-          resp = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(servico)
-          });
-        }
-        if (!resp.ok) throw new Error();
+        });
+      }
+      if (!resp.ok) throw new Error();
         carregarServicos();
         closeModal();
-      } catch {
+    } catch {
         alert('Erro ao salvar serviço.');
       }
     });
@@ -1076,23 +1076,18 @@ function reservasController() {
   const API_URL = `${BASE_URL}/reservas-peca`;
   const tableBody = document.querySelector('#reservas-table tbody');
   const novoBtn = document.getElementById('nova-reserva');
-
   let servicosCache = [];
 
-  async function carregarServicos() {
-    try {
-      const resp = await fetch(`${BASE_URL}/servicos`);
-      servicosCache = await resp.json();
-    } catch (err) {
-      servicosCache = [];
-    }
-  }
-
-  async function getReservasPorOrdem(ordemId) {
-    if (!ordemId) return [];
-    const resp = await fetch(`${API_URL}`);
-    const reservas = await resp.json();
-    return reservas.filter(r => r.abertura_servico_id == ordemId);
+  // Função para buscar opções para o formulário de reserva
+  async function getSelectOptions() {
+    // Buscar ordens de serviço e peças
+    const [ordensResp, pecasResp] = await Promise.all([
+      fetch(`${BASE_URL}/aberturaservico`),
+      fetch(`${BASE_URL}/pecas`)
+    ]);
+    const ordens = await ordensResp.json();
+    const pecas = await pecasResp.json();
+    return { ordens, pecas };
   }
 
   function getFormHtml(reserva = {}, options = {}, reservasOrdem = []) {
@@ -1111,7 +1106,7 @@ function reservasController() {
           <option value="">Selecione</option>
           ${ordens.map(o => `<option value="${o.id}" ${reserva.abertura_servico_id==o.id?'selected':''}>${o.id} - ${o.veiculo?.placa || ''} - ${o.servico?.descricao || ''}</option>`).join('')}
         </select></div>
-        <div><label>Peça:</label><select id="reserva-peca" required>
+        <div><label>Peça:</label><select id="reserva-peca" required autocomplete="off">
           <option value="">Selecione</option>
           ${pecas.map(p => {
             const reservado = reservasPorPeca[p.id] || 0;
@@ -1146,32 +1141,42 @@ function reservasController() {
         msg.textContent = '';
         return;
       }
-      // Soma já reservada para essa peça nessa ordem (exceto a reserva atual, se for edição)
       let reservado = 0;
+      const reservaAtualId = document.getElementById('reserva-id')?.value;
       reservasOrdem.forEach(r => {
-        if (r.peca_id == pecaId && (!form.reservaId || r.id != form.reservaId.value)) {
+        if (r.peca_id == pecaId && (!reservaAtualId || r.id != reservaAtualId)) {
           reservado += Number(r.quantidade);
         }
       });
-      // Estoque disponível
-      const opt = pecaSelect.querySelector(`option[value="${pecaId}"]`);
-      const disponivel = Number(opt?.dataset?.disponivel || 0);
-      // Limite máximo: não pode passar de 5 no total para a ordem, nem do estoque
-      const maxQtd = Math.min(5 - reservado, disponivel);
+      // Buscar estoque real da peça selecionada
+      const options = await getSelectOptions();
+      const pecaObj = options.pecas.find(p => p.id == pecaId);
+      const estoque = pecaObj ? Number(pecaObj.estoque) : 0;
+      const maxQtd = Math.min(5 - reservado, estoque);
       qtdInput.max = maxQtd > 0 ? maxQtd : 1;
       msg.textContent = `Máximo permitido: ${qtdInput.max}`;
       if (Number(qtdInput.value) > qtdInput.max) qtdInput.value = qtdInput.max;
     }
 
     ordemSelect.addEventListener('change', async () => {
-      // Ao trocar ordem, recarregar reservas e atualizar peças disponíveis
       const ordemId = ordemSelect.value;
       const options = await getSelectOptions();
       const reservasOrdemAtual = await getReservasPorOrdem(ordemId);
-      openModal(getFormHtml({}, options, reservasOrdemAtual));
-      setupFormEvents(reservasOrdemAtual);
+      // Atualiza apenas o select de peças
+      pecaSelect.innerHTML = '<option value="">Selecione</option>' +
+        options.pecas.map(p => {
+          const reservado = reservasOrdemAtual.reduce((acc, r) => r.peca_id == p.id ? acc + Number(r.quantidade) : acc, 0);
+          const disponivel = Math.max(0, p.estoque - reservado);
+          return `<option value="${p.id}" data-disponivel="${disponivel}">${p.nome} (Disponível: ${disponivel})</option>`;
+        }).join('');
+      // Atualiza o limite de quantidade
+      atualizarLimite();
     });
-    pecaSelect.addEventListener('change', atualizarLimite);
+    // Garante que o select de peças só chama atualizarLimite
+    pecaSelect.addEventListener('change', e => {
+      e.stopPropagation();
+      atualizarLimite();
+    });
     qtdInput.addEventListener('input', atualizarLimite);
     cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
     closeBtn.addEventListener('click', closeModal);
@@ -1214,7 +1219,7 @@ function reservasController() {
 
   async function carregarReservas() {
     try {
-      await carregarServicos();
+      await carregarServicosCache();
       const resp = await fetch(API_URL);
       const reservas = await resp.json();
       console.log('RESERVAS CARREGADAS:', reservas);
@@ -1297,6 +1302,28 @@ function reservasController() {
   });
 
   carregarReservas();
+
+  // Função para buscar e preencher o cache de serviços
+  async function carregarServicosCache() {
+    try {
+      const resp = await fetch(`${BASE_URL}/servicos`);
+      servicosCache = await resp.json();
+    } catch (err) {
+      servicosCache = [];
+    }
+  }
+
+  // Função para buscar reservas de uma ordem específica
+  async function getReservasPorOrdem(ordemId) {
+    if (!ordemId) return [];
+    try {
+      const resp = await fetch(`${BASE_URL}/reservas-peca?abertura_servico_id=${ordemId}`);
+      if (!resp.ok) return [];
+      return await resp.json();
+    } catch {
+      return [];
+    }
+  }
 }
 
 // Relatórios SPA
@@ -1400,7 +1427,7 @@ function renderRelatorioServicosMais() {
       alert('Selecione o período!');
       return;
     }
-    const url = `${API_URL}/relatorio-servicos?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    const url = `${BASE_URL}/relatorio-servicos?dataInicio=${dataInicio}&dataFim=${dataFim}`;
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('Erro ao buscar relatório');
@@ -1478,7 +1505,7 @@ function renderRelatorioPecasMais() {
       alert('Selecione o período!');
       return;
     }
-    const url = `${API_URL}/reservas-peca/relatorio/mais-reservadas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    const url = `${BASE_URL}/reservas-peca/relatorio/mais-reservadas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('Erro ao buscar relatório');
@@ -1556,7 +1583,7 @@ function renderRelatorioServicosPecas() {
       alert('Selecione o período!');
       return;
     }
-    const url = `${API_URL}/reservas-peca/relatorio/servicos-mais-pecas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    const url = `${BASE_URL}/reservas-peca/relatorio/servicos-mais-pecas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('Erro ao buscar relatório');
@@ -1634,7 +1661,7 @@ function renderRelatorioOSExecutadas() {
       alert('Selecione o período!');
       return;
     }
-    const url = `${API_URL}/ExecucaoServico/relatorios/ordens?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    const url = `${BASE_URL}/ExecucaoServico/relatorios/ordens?dataInicio=${dataInicio}&dataFim=${dataFim}`;
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('Erro ao buscar relatório');
@@ -1735,7 +1762,7 @@ function renderRelatorioDesempenhoFunc() {
       alert('Selecione o período!');
       return;
     }
-    const url = `${API_URL}/ExecucaoServico/relatorios/desempenho?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    const url = `${BASE_URL}/ExecucaoServico/relatorios/desempenho?dataInicio=${dataInicio}&dataFim=${dataFim}`;
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('Erro ao buscar relatório');

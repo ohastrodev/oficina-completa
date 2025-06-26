@@ -16,16 +16,23 @@
         <li><a href="#" data-section="veiculos">Veículos</a></li>
         <li><a href="#" data-section="servicos">Serviços</a></li>
         <li><a href="#" data-section="pecas">Peças</a></li>
-        <li><a href="#" data-section="ordens">Processos</a></li>
-        <li>
+        <li class="has-submenu">
+          <a href="#" id="processos-menu">Processos</a>
+          <ul class="submenu" id="processos-submenu">
+            <li class="menu-item" data-section="ordens">Abertura de OS</li>
+            <li class="menu-item" data-section="execucoes">Execução de Serviço</li>
+            <li class="menu-item" data-section="reservas">Reserva de Peça</li>
+          </ul>
+        </li>
+        <li class="has-submenu">
           <a href="#" id="relatorios-menu">Relatórios</a>
           <ul class="submenu" id="relatorios-submenu">
-            <li class="menu-item" data-section="relatorio-os-funcionario">Relatório: OS por Funcionário</li>
-            <li class="menu-item" data-section="relatorio-servicos-mais">Relatório: Serviços mais prestados</li>
-            <li class="menu-item" data-section="relatorio-pecas-mais">Relatório: Peças mais reservadas</li>
-            <li class="menu-item" data-section="relatorio-servicos-pecas">Relatório: Serviços com mais peças reservadas</li>
-            <li class="menu-item" data-section="relatorio-os-executadas">Relatório: OS Executadas</li>
-            <li class="menu-item" data-section="relatorio-desempenho-func">Relatório: Desempenho de Funcionário</li>
+            <li class="menu-item" data-section="relatorio-os-funcionario">OS por Funcionário</li>
+            <li class="menu-item" data-section="relatorio-servicos-mais">Serviços mais prestados</li>
+            <li class="menu-item" data-section="relatorio-pecas-mais">Peças mais reservadas</li>
+            <li class="menu-item" data-section="relatorio-servicos-pecas">Serviços com mais peças reservadas</li>
+            <li class="menu-item" data-section="relatorio-os-executadas">OS Executadas</li>
+            <li class="menu-item" data-section="relatorio-desempenho-func">Desempenho de Funcionário</li>
           </ul>
         </li>
       </ul>

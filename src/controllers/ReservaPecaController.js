@@ -28,17 +28,12 @@ export const ReservaPecaController = {
   async create(req, res) {
     try {
       const { abertura_servico_id, peca_id, quantidade } = req.body;
-      // Regra 1: Não pode reservar mais de 5 peças para o mesmo serviço
+      // Regra: Não pode reservar mais de 5 unidades da mesma peça para o mesmo serviço
       const totalReservadas = await ReservaPeca.sum('quantidade', {
-        where: { abertura_servico_id }
+        where: { abertura_servico_id, peca_id }
       });
       if ((totalReservadas || 0) + quantidade > 5) {
-        return res.status(400).json({ error: 'Não é possível reservar mais de 5 peças para este serviço!' });
-      }
-      // Regra 2: Não pode reservar a mesma peça mais de uma vez para o mesmo serviço
-      const reservaExistente = await ReservaPeca.findOne({ where: { abertura_servico_id, peca_id } });
-      if (reservaExistente) {
-        return res.status(400).json({ error: 'Já existe uma reserva desta peça para este serviço!' });
+        return res.status(400).json({ error: 'Não é possível reservar mais de 5 unidades desta peça para este serviço!' });
       }
       // Regra 3: Não pode reservar mais peças do que o estoque disponível
       const peca = await Peca.findByPk(peca_id);
@@ -67,11 +62,12 @@ export const ReservaPecaController = {
       const totalReservadas = await ReservaPeca.sum('quantidade', {
         where: {
           abertura_servico_id: reserva.abertura_servico_id,
+          peca_id: reserva.peca_id,
           id: { [Op.ne]: id }
         }
       });
       if ((totalReservadas || 0) + quantidade > 5) {
-        return res.status(400).json({ error: 'Não é possível reservar mais de 5 peças para este serviço!' });
+        return res.status(400).json({ error: 'Não é possível reservar mais de 5 unidades desta peça para este serviço!' });
       }
       const peca = await Peca.findByPk(reserva.peca_id);
       const totalReservadasDestaPeca = await ReservaPeca.sum('quantidade', {
