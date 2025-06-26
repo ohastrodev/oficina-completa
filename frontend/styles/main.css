@@ -2,18 +2,22 @@ body {
   font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f6f8fa;
-  color: #222;
+  background: #111;
+  color: #FFD600;
+  min-height: 100vh;
 }
 header {
-  background: #2d3e50;
-  color: #fff;
-  padding: 1rem 0;
+  background: #FFD600;
+  color: #111;
+  padding: 1.5rem 0 1rem 0;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 header h1 {
   margin: 0 0 0.5rem 0;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
+  letter-spacing: 2px;
+  font-weight: bold;
 }
 nav ul {
   list-style: none;
@@ -46,54 +50,58 @@ nav ul.menu {
   flex-wrap: wrap;
 }
 nav ul.menu li {
-  margin: 0 1rem;
+  margin: 0 0.5rem;
   position: relative;
 }
-nav ul.menu li a {
-  color: #fff;
+nav ul.menu li a, nav ul.menu li .dropbtn {
+  color: #111;
+  background: #FFD600;
   text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background 0.2s;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
   display: inline-block;
+  font-size: 1.05rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 nav ul.menu li a:hover, nav ul.menu li .dropbtn:hover {
-  background: #1a2533;
-}
-nav ul.menu li.dropdown {
-  cursor: pointer;
+  background: #111;
+  color: #FFD600;
 }
 nav ul.menu li .dropdown-content {
   display: none;
   position: absolute;
-  background: #2d3e50;
+  background: #FFD600;
   min-width: 180px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   z-index: 1;
   border-radius: 0 0 8px 8px;
   top: 100%;
   left: 0;
 }
 nav ul.menu li .dropdown-content a {
-  color: #fff;
+  color: #111;
   padding: 0.7rem 1rem;
   display: block;
   border-radius: 0;
+  font-weight: 500;
 }
 nav ul.menu li .dropdown-content a:hover {
-  background: #1a2533;
+  background: #111;
+  color: #FFD600;
 }
 nav ul.menu li.dropdown:hover .dropdown-content {
   display: block;
 }
 main {
-  max-width: 900px;
-  margin: 2rem auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  padding: 2rem;
+  max-width: 1000px;
+  margin: 2.5rem auto 3.5rem auto;
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem;
+  color: #FFD600;
 }
 .welcome {
   text-align: center;
@@ -101,11 +109,97 @@ main {
 footer {
   text-align: center;
   padding: 1rem 0;
-  background: #2d3e50;
-  color: #fff;
+  background: #FFD600;
+  color: #111;
   position: fixed;
   width: 100%;
   bottom: 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  background: #181818;
+  color: #FFD600;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+table th, table td {
+  padding: 0.85rem 0.7rem;
+  text-align: left;
+}
+table th {
+  background: #FFD600;
+  color: #111;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-bottom: 2px solid #111;
+}
+table tr:nth-child(even) {
+  background: #232323;
+}
+table tr:hover {
+  background: #333;
+}
+form {
+  background: #181818;
+  padding: 1.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+  margin-bottom: 1.5rem;
+}
+form div {
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+form label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #FFD600;
+}
+form input, form select {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #FFD600;
+  border-radius: 5px;
+  background: #222;
+  color: #FFD600;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+form input:focus, form select:focus {
+  border: 2px solid #FFD600;
+  background: #181818;
+}
+button, input[type="submit"] {
+  background: #FFD600;
+  color: #111;
+  border: none;
+  border-radius: 5px;
+  padding: 0.7rem 1.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+button:hover, input[type="submit"]:hover {
+  background: #111;
+  color: #FFD600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+@media (max-width: 900px) {
+  main {
+    max-width: 98vw;
+    padding: 1.2rem 0.5rem;
+  }
 }
 @media (max-width: 600px) {
   nav ul {
@@ -128,6 +222,67 @@ footer {
     min-width: 160px;
   }
   main {
-    padding: 1rem;
+    padding: 0.5rem;
+  }
+  table th, table td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.98rem;
+  }
+  form {
+    padding: 1rem 0.3rem;
+  }
+}
+
+/* Modal customizado */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal {
+  background: #181818;
+  color: #FFD600;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalPop 0.25s;
+}
+@keyframes modalPop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #FFD600;
+  font-size: 1.7rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: #fff200;
+}
+@media (max-width: 600px) {
+  .modal {
+    padding: 1rem 0.3rem 1.2rem 0.3rem;
+    min-width: 0;
   }
 } 

@@ -3,6 +3,24 @@
 const BASE_URL = 'https://oficina-completa-backend-sequelize.onrender.com';
 const app = document.getElementById('app');
 
+// Função utilitária para criar e abrir modal
+function openModal(contentHtml) {
+  // Remove modal antigo se existir
+  closeModal();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `<div class="modal">${contentHtml}</div>`;
+  document.body.appendChild(backdrop);
+  // Fechar ao clicar fora do modal
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) closeModal();
+  });
+}
+function closeModal() {
+  const old = document.querySelector('.modal-backdrop');
+  if (old) old.remove();
+}
+
 // Rotas/Seções
 const sections = {
   funcionarios: renderFuncionariosSection,
@@ -27,11 +45,30 @@ function setupMenu() {
   });
 }
 
+// Função para aplicar máscara de CPF
+function maskCPF(value) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+    .slice(0, 14);
+}
+// Função para aplicar máscara de telefone
+function maskTelefone(value) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+    .slice(0, 15);
+}
+
 // CRUD Funcionários
 function renderFuncionariosSection() {
   app.innerHTML = `
     <section>
       <h2>Funcionários</h2>
+      <button id="novo-funcionario">Novo Funcionário</button>
       <table id="funcionarios-table">
         <thead>
           <tr>
@@ -49,21 +86,6 @@ function renderFuncionariosSection() {
         <tbody></tbody>
       </table>
     </section>
-    <section>
-      <h2 id="form-title-func">Cadastrar Novo Funcionário</h2>
-      <form id="funcionario-form">
-        <input type="hidden" id="funcionario-id">
-        <div><label>Nome:</label><input type="text" id="func-nome" required></div>
-        <div><label>Cargo:</label><input type="text" id="func-cargo" required></div>
-        <div><label>CPF:</label><input type="text" id="func-cpf" required></div>
-        <div><label>Telefone:</label><input type="text" id="func-telefone" required></div>
-        <div><label>Data de Admissão:</label><input type="date" id="func-dataDeAdmissao" required></div>
-        <div><label>Especialidade:</label><input type="text" id="func-especialidade" required></div>
-        <div><label>Salário:</label><input type="number" step="0.01" id="func-salario" required></div>
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancelar-edicao-func" style="display:none;">Cancelar</button>
-      </form>
-    </section>
   `;
   funcionariosController();
 }
@@ -71,28 +93,25 @@ function renderFuncionariosSection() {
 function funcionariosController() {
   const API_URL = `${BASE_URL}/funcionarios`;
   const tableBody = document.querySelector('#funcionarios-table tbody');
-  const form = document.getElementById('funcionario-form');
-  const formTitle = document.getElementById('form-title-func');
-  const cancelarBtn = document.getElementById('cancelar-edicao-func');
+  const novoBtn = document.getElementById('novo-funcionario');
 
-  function limparFormulario() {
-    form.reset();
-    document.getElementById('funcionario-id').value = '';
-    formTitle.textContent = 'Cadastrar Novo Funcionário';
-    cancelarBtn.style.display = 'none';
-  }
-
-  function preencherFormulario(func) {
-    document.getElementById('funcionario-id').value = func.id;
-    document.getElementById('func-nome').value = func.nome;
-    document.getElementById('func-cargo').value = func.cargo;
-    document.getElementById('func-cpf').value = func.cpf;
-    document.getElementById('func-telefone').value = func.telefone;
-    document.getElementById('func-dataDeAdmissao').value = func.dataDeAdmissao;
-    document.getElementById('func-especialidade').value = func.especialidade;
-    document.getElementById('func-salario').value = func.salario;
-    formTitle.textContent = 'Editar Funcionário';
-    cancelarBtn.style.display = 'inline-block';
+  function getFormHtml(func = {}) {
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2 id="form-title-func">${func.id ? 'Editar Funcionário' : 'Cadastrar Novo Funcionário'}</h2>
+      <form id="funcionario-form">
+        <input type="hidden" id="funcionario-id" value="${func.id || ''}">
+        <div><label>Nome:</label><input type="text" id="func-nome" value="${func.nome || ''}" required></div>
+        <div><label>Cargo:</label><input type="text" id="func-cargo" value="${func.cargo || ''}" required></div>
+        <div><label>CPF:</label><input type="text" id="func-cpf" value="${func.cpf || ''}" required></div>
+        <div><label>Telefone:</label><input type="text" id="func-telefone" value="${func.telefone || ''}" required></div>
+        <div><label>Data de Admissão:</label><input type="date" id="func-dataDeAdmissao" value="${func.dataDeAdmissao || ''}" required></div>
+        <div><label>Especialidade:</label><input type="text" id="func-especialidade" value="${func.especialidade || ''}" required></div>
+        <div><label>Salário:</label><input type="number" step="0.01" id="func-salario" value="${func.salario || ''}" required></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-edicao-func">Cancelar</button>
+      </form>
+    `;
   }
 
   function renderizarTabela(funcionarios) {
@@ -121,7 +140,8 @@ function funcionariosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
           if (!resp.ok) throw new Error();
           const func = await resp.json();
-          preencherFormulario(func);
+          openModal(getFormHtml(func));
+          setupFormEvents();
         } catch {
           alert('Erro ao buscar funcionário.');
         }
@@ -134,12 +154,67 @@ function funcionariosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
           if (!resp.ok) throw new Error();
           carregarFuncionarios();
-          limparFormulario();
         } catch {
           alert('Erro ao excluir funcionário.');
         }
       });
     });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('funcionario-form');
+    const cancelarBtn = document.getElementById('cancelar-edicao-func');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('funcionario-id').value;
+      const funcionario = {
+        nome: document.getElementById('func-nome').value,
+        cargo: document.getElementById('func-cargo').value,
+        cpf: document.getElementById('func-cpf').value,
+        telefone: document.getElementById('func-telefone').value,
+        dataDeAdmissao: document.getElementById('func-dataDeAdmissao').value,
+        especialidade: document.getElementById('func-especialidade').value,
+        salario: document.getElementById('func-salario').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(funcionario)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(funcionario)
+          });
+        }
+        if (!resp.ok) throw new Error();
+        carregarFuncionarios();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar funcionário.');
+      }
+    });
+    const cpfInput = document.getElementById('func-cpf');
+    const telInput = document.getElementById('func-telefone');
+    if (cpfInput) {
+      cpfInput.addEventListener('input', function() {
+        this.value = maskCPF(this.value);
+      });
+    }
+    if (telInput) {
+      telInput.addEventListener('input', function() {
+        this.value = maskTelefone(this.value);
+      });
+    }
   }
 
   async function carregarFuncionarios() {
@@ -152,42 +227,10 @@ function funcionariosController() {
     }
   }
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('funcionario-id').value;
-    const funcionario = {
-      nome: document.getElementById('func-nome').value,
-      cargo: document.getElementById('func-cargo').value,
-      cpf: document.getElementById('func-cpf').value,
-      telefone: document.getElementById('func-telefone').value,
-      dataDeAdmissao: document.getElementById('func-dataDeAdmissao').value,
-      especialidade: document.getElementById('func-especialidade').value,
-      salario: document.getElementById('func-salario').value
-    };
-    try {
-      let resp;
-      if (id) {
-        resp = await fetch(`${API_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(funcionario)
-        });
-      } else {
-        resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(funcionario)
-        });
-      }
-      if (!resp.ok) throw new Error();
-      carregarFuncionarios();
-      limparFormulario();
-    } catch {
-      alert('Erro ao salvar funcionário.');
-    }
+  novoBtn.addEventListener('click', () => {
+    openModal(getFormHtml());
+    setupFormEvents();
   });
-
-  cancelarBtn.addEventListener('click', limparFormulario);
 
   carregarFuncionarios();
 }
@@ -197,6 +240,7 @@ function renderVeiculosSection() {
   app.innerHTML = `
     <section>
       <h2>Veículos</h2>
+      <button id="novo-veiculo">Novo Veículo</button>
       <table id="veiculos-table">
         <thead>
           <tr>
@@ -213,20 +257,6 @@ function renderVeiculosSection() {
         <tbody></tbody>
       </table>
     </section>
-    <section>
-      <h2 id="form-title-veic">Cadastrar Novo Veículo</h2>
-      <form id="veiculo-form">
-        <input type="hidden" id="veiculo-id">
-        <div><label>Marca:</label><input type="text" id="veic-marca" required></div>
-        <div><label>Modelo:</label><input type="text" id="veic-modelo" required></div>
-        <div><label>Ano:</label><input type="number" id="veic-ano" required></div>
-        <div><label>Nº Chassi:</label><input type="text" id="veic-numeroChassi" required></div>
-        <div><label>Tipo Combustível:</label><input type="text" id="veic-tipoCombustivel" required></div>
-        <div><label>Placa:</label><input type="text" id="veic-placa" required></div>
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancelar-edicao-veic" style="display:none;">Cancelar</button>
-      </form>
-    </section>
   `;
   veiculosController();
 }
@@ -234,27 +264,24 @@ function renderVeiculosSection() {
 function veiculosController() {
   const API_URL = `${BASE_URL}/veiculos`;
   const tableBody = document.querySelector('#veiculos-table tbody');
-  const form = document.getElementById('veiculo-form');
-  const formTitle = document.getElementById('form-title-veic');
-  const cancelarBtn = document.getElementById('cancelar-edicao-veic');
+  const novoBtn = document.getElementById('novo-veiculo');
 
-  function limparFormulario() {
-    form.reset();
-    document.getElementById('veiculo-id').value = '';
-    formTitle.textContent = 'Cadastrar Novo Veículo';
-    cancelarBtn.style.display = 'none';
-  }
-
-  function preencherFormulario(veic) {
-    document.getElementById('veiculo-id').value = veic.id;
-    document.getElementById('veic-marca').value = veic.marca;
-    document.getElementById('veic-modelo').value = veic.modelo;
-    document.getElementById('veic-ano').value = veic.ano;
-    document.getElementById('veic-numeroChassi').value = veic.numeroChassi;
-    document.getElementById('veic-tipoCombustivel').value = veic.tipoCombustivel;
-    document.getElementById('veic-placa').value = veic.placa;
-    formTitle.textContent = 'Editar Veículo';
-    cancelarBtn.style.display = 'inline-block';
+  function getFormHtml(veic = {}) {
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2 id="form-title-veic">${veic.id ? 'Editar Veículo' : 'Cadastrar Novo Veículo'}</h2>
+      <form id="veiculo-form">
+        <input type="hidden" id="veiculo-id" value="${veic.id || ''}">
+        <div><label>Marca:</label><input type="text" id="veic-marca" value="${veic.marca || ''}" required></div>
+        <div><label>Modelo:</label><input type="text" id="veic-modelo" value="${veic.modelo || ''}" required></div>
+        <div><label>Ano:</label><input type="number" id="veic-ano" value="${veic.ano || ''}" required></div>
+        <div><label>Nº Chassi:</label><input type="text" id="veic-numeroChassi" value="${veic.numeroChassi || ''}" required></div>
+        <div><label>Tipo Combustível:</label><input type="text" id="veic-tipoCombustivel" value="${veic.tipoCombustivel || ''}" required></div>
+        <div><label>Placa:</label><input type="text" id="veic-placa" value="${veic.placa || ''}" required></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-edicao-veic">Cancelar</button>
+      </form>
+    `;
   }
 
   function renderizarTabela(veiculos) {
@@ -282,7 +309,8 @@ function veiculosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
           if (!resp.ok) throw new Error();
           const veic = await resp.json();
-          preencherFormulario(veic);
+          openModal(getFormHtml(veic));
+          setupFormEvents();
         } catch {
           alert('Erro ao buscar veículo.');
         }
@@ -295,11 +323,54 @@ function veiculosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
           if (!resp.ok) throw new Error();
           carregarVeiculos();
-          limparFormulario();
         } catch {
           alert('Erro ao excluir veículo.');
         }
       });
+    });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('veiculo-form');
+    const cancelarBtn = document.getElementById('cancelar-edicao-veic');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('veiculo-id').value;
+      const veiculo = {
+        marca: document.getElementById('veic-marca').value,
+        modelo: document.getElementById('veic-modelo').value,
+        ano: document.getElementById('veic-ano').value,
+        numeroChassi: document.getElementById('veic-numeroChassi').value,
+        tipoCombustivel: document.getElementById('veic-tipoCombustivel').value,
+        placa: document.getElementById('veic-placa').value,
+        clienteId: null // sempre enviar clienteId, mesmo que não use
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(veiculo)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(veiculo)
+          });
+        }
+        if (!resp.ok) throw new Error();
+        carregarVeiculos();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar veículo.');
+      }
     });
   }
 
@@ -313,41 +384,10 @@ function veiculosController() {
     }
   }
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('veiculo-id').value;
-    const veiculo = {
-      marca: document.getElementById('veic-marca').value,
-      modelo: document.getElementById('veic-modelo').value,
-      ano: document.getElementById('veic-ano').value,
-      numeroChassi: document.getElementById('veic-numeroChassi').value,
-      tipoCombustivel: document.getElementById('veic-tipoCombustivel').value,
-      placa: document.getElementById('veic-placa').value
-    };
-    try {
-      let resp;
-      if (id) {
-        resp = await fetch(`${API_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(veiculo)
-        });
-      } else {
-        resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(veiculo)
-        });
-      }
-      if (!resp.ok) throw new Error();
-      carregarVeiculos();
-      limparFormulario();
-    } catch {
-      alert('Erro ao salvar veículo.');
-    }
+  novoBtn.addEventListener('click', () => {
+    openModal(getFormHtml());
+    setupFormEvents();
   });
-
-  cancelarBtn.addEventListener('click', limparFormulario);
 
   carregarVeiculos();
 }
@@ -357,6 +397,7 @@ function renderServicosSection() {
   app.innerHTML = `
     <section>
       <h2>Serviços</h2>
+      <button id="novo-servico">Novo Serviço</button>
       <table id="servicos-table">
         <thead>
           <tr>
@@ -370,17 +411,6 @@ function renderServicosSection() {
         <tbody></tbody>
       </table>
     </section>
-    <section>
-      <h2 id="form-title-serv">Cadastrar Novo Serviço</h2>
-      <form id="servico-form">
-        <input type="hidden" id="servico-id">
-        <div><label>Descrição:</label><input type="text" id="serv-descricao" required></div>
-        <div><label>Mão de Obra:</label><input type="number" step="0.01" id="serv-maoObra" required></div>
-        <div><label>Categoria:</label><input type="text" id="serv-categoria" maxlength="1" required></div>
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancelar-edicao-serv" style="display:none;">Cancelar</button>
-      </form>
-    </section>
   `;
   servicosController();
 }
@@ -388,24 +418,21 @@ function renderServicosSection() {
 function servicosController() {
   const API_URL = `${BASE_URL}/servicos`;
   const tableBody = document.querySelector('#servicos-table tbody');
-  const form = document.getElementById('servico-form');
-  const formTitle = document.getElementById('form-title-serv');
-  const cancelarBtn = document.getElementById('cancelar-edicao-serv');
+  const novoBtn = document.getElementById('novo-servico');
 
-  function limparFormulario() {
-    form.reset();
-    document.getElementById('servico-id').value = '';
-    formTitle.textContent = 'Cadastrar Novo Serviço';
-    cancelarBtn.style.display = 'none';
-  }
-
-  function preencherFormulario(serv) {
-    document.getElementById('servico-id').value = serv.id;
-    document.getElementById('serv-descricao').value = serv.descricao;
-    document.getElementById('serv-maoObra').value = serv.maoObra;
-    document.getElementById('serv-categoria').value = serv.categoria;
-    formTitle.textContent = 'Editar Serviço';
-    cancelarBtn.style.display = 'inline-block';
+  function getFormHtml(serv = {}) {
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2 id="form-title-serv">${serv.id ? 'Editar Serviço' : 'Cadastrar Novo Serviço'}</h2>
+      <form id="servico-form">
+        <input type="hidden" id="servico-id" value="${serv.id || ''}">
+        <div><label>Descrição:</label><input type="text" id="serv-descricao" value="${serv.descricao || ''}" required></div>
+        <div><label>Mão de Obra:</label><input type="number" step="0.01" id="serv-maoObra" value="${serv.maoObra || ''}" required></div>
+        <div><label>Categoria:</label><input type="text" id="serv-categoria" maxlength="1" value="${serv.categoria || ''}" required></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-edicao-serv">Cancelar</button>
+      </form>
+    `;
   }
 
   function renderizarTabela(servicos) {
@@ -430,7 +457,8 @@ function servicosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
           if (!resp.ok) throw new Error();
           const serv = await resp.json();
-          preencherFormulario(serv);
+          openModal(getFormHtml(serv));
+          setupFormEvents();
         } catch {
           alert('Erro ao buscar serviço.');
         }
@@ -443,11 +471,50 @@ function servicosController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
           if (!resp.ok) throw new Error();
           carregarServicos();
-          limparFormulario();
         } catch {
           alert('Erro ao excluir serviço.');
         }
       });
+    });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('servico-form');
+    const cancelarBtn = document.getElementById('cancelar-edicao-serv');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('servico-id').value;
+      const servico = {
+        descricao: document.getElementById('serv-descricao').value,
+        maoObra: document.getElementById('serv-maoObra').value,
+        categoria: document.getElementById('serv-categoria').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(servico)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(servico)
+          });
+        }
+        if (!resp.ok) throw new Error();
+        carregarServicos();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar serviço.');
+      }
     });
   }
 
@@ -461,38 +528,10 @@ function servicosController() {
     }
   }
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('servico-id').value;
-    const servico = {
-      descricao: document.getElementById('serv-descricao').value,
-      maoObra: document.getElementById('serv-maoObra').value,
-      categoria: document.getElementById('serv-categoria').value
-    };
-    try {
-      let resp;
-      if (id) {
-        resp = await fetch(`${API_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(servico)
-        });
-      } else {
-        resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(servico)
-        });
-      }
-      if (!resp.ok) throw new Error();
-      carregarServicos();
-      limparFormulario();
-    } catch {
-      alert('Erro ao salvar serviço.');
-    }
+  novoBtn.addEventListener('click', () => {
+    openModal(getFormHtml());
+    setupFormEvents();
   });
-
-  cancelarBtn.addEventListener('click', limparFormulario);
 
   carregarServicos();
 }
@@ -502,6 +541,7 @@ function renderPecasSection() {
   app.innerHTML = `
     <section>
       <h2>Peças</h2>
+      <button id="nova-peca">Nova Peça</button>
       <table id="pecas-table">
         <thead>
           <tr>
@@ -516,18 +556,6 @@ function renderPecasSection() {
         <tbody></tbody>
       </table>
     </section>
-    <section>
-      <h2 id="form-title-peca">Cadastrar Nova Peça</h2>
-      <form id="peca-form">
-        <input type="hidden" id="peca-id">
-        <div><label>Nome:</label><input type="text" id="peca-nome" required></div>
-        <div><label>Código:</label><input type="number" id="peca-codigo" required></div>
-        <div><label>Preço:</label><input type="number" step="0.01" id="peca-preco" required></div>
-        <div><label>Estoque:</label><input type="number" id="peca-estoque" required></div>
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancelar-edicao-peca" style="display:none;">Cancelar</button>
-      </form>
-    </section>
   `;
   pecasController();
 }
@@ -535,25 +563,22 @@ function renderPecasSection() {
 function pecasController() {
   const API_URL = `${BASE_URL}/pecas`;
   const tableBody = document.querySelector('#pecas-table tbody');
-  const form = document.getElementById('peca-form');
-  const formTitle = document.getElementById('form-title-peca');
-  const cancelarBtn = document.getElementById('cancelar-edicao-peca');
+  const novoBtn = document.getElementById('nova-peca');
 
-  function limparFormulario() {
-    form.reset();
-    document.getElementById('peca-id').value = '';
-    formTitle.textContent = 'Cadastrar Nova Peça';
-    cancelarBtn.style.display = 'none';
-  }
-
-  function preencherFormulario(peca) {
-    document.getElementById('peca-id').value = peca.id;
-    document.getElementById('peca-nome').value = peca.nome;
-    document.getElementById('peca-codigo').value = peca.codigo;
-    document.getElementById('peca-preco').value = peca.preco;
-    document.getElementById('peca-estoque').value = peca.estoque;
-    formTitle.textContent = 'Editar Peça';
-    cancelarBtn.style.display = 'inline-block';
+  function getFormHtml(peca = {}) {
+    return `
+      <button class="modal-close" title="Fechar" type="button">&times;</button>
+      <h2 id="form-title-peca">${peca.id ? 'Editar Peça' : 'Cadastrar Nova Peça'}</h2>
+      <form id="peca-form">
+        <input type="hidden" id="peca-id" value="${peca.id || ''}">
+        <div><label>Nome:</label><input type="text" id="peca-nome" value="${peca.nome || ''}" required></div>
+        <div><label>Código:</label><input type="number" id="peca-codigo" value="${peca.codigo || ''}" required></div>
+        <div><label>Preço:</label><input type="number" step="0.01" id="peca-preco" value="${peca.preco || ''}" required></div>
+        <div><label>Estoque:</label><input type="number" id="peca-estoque" value="${peca.estoque || ''}" required></div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-edicao-peca">Cancelar</button>
+      </form>
+    `;
   }
 
   function renderizarTabela(pecas) {
@@ -579,7 +604,8 @@ function pecasController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`);
           if (!resp.ok) throw new Error();
           const peca = await resp.json();
-          preencherFormulario(peca);
+          openModal(getFormHtml(peca));
+          setupFormEvents();
         } catch {
           alert('Erro ao buscar peça.');
         }
@@ -592,11 +618,51 @@ function pecasController() {
           const resp = await fetch(`${API_URL}/${btn.dataset.id}`, { method: 'DELETE' });
           if (!resp.ok) throw new Error();
           carregarPecas();
-          limparFormulario();
         } catch {
           alert('Erro ao excluir peça.');
         }
       });
+    });
+  }
+
+  function setupFormEvents() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (!modal) return;
+    const form = document.getElementById('peca-form');
+    const cancelarBtn = document.getElementById('cancelar-edicao-peca');
+    const closeBtn = document.querySelector('.modal-close');
+    cancelarBtn.addEventListener('click', e => { e.preventDefault(); closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('peca-id').value;
+      const peca = {
+        nome: document.getElementById('peca-nome').value,
+        codigo: document.getElementById('peca-codigo').value,
+        preco: document.getElementById('peca-preco').value,
+        estoque: document.getElementById('peca-estoque').value
+      };
+      try {
+        let resp;
+        if (id) {
+          resp = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(peca)
+          });
+        } else {
+          resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(peca)
+          });
+        }
+        if (!resp.ok) throw new Error();
+        carregarPecas();
+        closeModal();
+      } catch {
+        alert('Erro ao salvar peça.');
+      }
     });
   }
 
@@ -610,51 +676,96 @@ function pecasController() {
     }
   }
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('peca-id').value;
-    const peca = {
-      nome: document.getElementById('peca-nome').value,
-      codigo: document.getElementById('peca-codigo').value,
-      preco: document.getElementById('peca-preco').value,
-      estoque: document.getElementById('peca-estoque').value
-    };
-    try {
-      let resp;
-      if (id) {
-        resp = await fetch(`${API_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(peca)
-        });
-      } else {
-        resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(peca)
-        });
-      }
-      if (!resp.ok) throw new Error();
-      carregarPecas();
-      limparFormulario();
-    } catch {
-      alert('Erro ao salvar peça.');
-    }
+  novoBtn.addEventListener('click', () => {
+    openModal(getFormHtml());
+    setupFormEvents();
   });
-
-  cancelarBtn.addEventListener('click', limparFormulario);
 
   carregarPecas();
 }
 
+// CRUD Abertura de Ordem de Serviço
 function renderOrdensSection() {
-  app.innerHTML = '<h2>Ordens de Serviço</h2><p>Em breve...</p>';
+  app.innerHTML = `
+    <section>
+      <h2>Abertura de Ordem de Serviço</h2>
+      <button id="nova-ordem">Nova Ordem</button>
+      <table id="ordens-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Veículo</th>
+            <th>Serviço</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  `;
+  ordensController();
 }
+
+function ordensController() {
+  // Implementação CRUD virá em seguida
+}
+
+// CRUD Execução de Serviço
 function renderExecucoesSection() {
-  app.innerHTML = '<h2>Execuções de Serviço</h2><p>Em breve...</p>';
+  app.innerHTML = `
+    <section>
+      <h2>Execução de Serviço</h2>
+      <button id="nova-execucao">Nova Execução</button>
+      <table id="execucoes-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Ordem de Serviço</th>
+            <th>Funcionário</th>
+            <th>Data Execução</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  `;
+  execucoesController();
 }
+
+function execucoesController() {
+  // Implementação CRUD virá em seguida
+}
+
+// CRUD Reserva de Peça
 function renderReservasSection() {
-  app.innerHTML = '<h2>Reservas de Peça</h2><p>Em breve...</p>';
+  app.innerHTML = `
+    <section>
+      <h2>Reserva de Peça</h2>
+      <button id="nova-reserva">Nova Reserva</button>
+      <table id="reservas-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Peça</th>
+            <th>Serviço</th>
+            <th>Quantidade</th>
+            <th>Data Reserva</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  `;
+  reservasController();
+}
+
+function reservasController() {
+  // Implementação CRUD virá em seguida
 }
 
 // Inicialização
