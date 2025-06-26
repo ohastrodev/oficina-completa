@@ -1,0 +1,133 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f6f8fa;
+  color: #222;
+}
+header {
+  background: #2d3e50;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+}
+header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.2rem;
+}
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+nav ul li {
+  margin: 0 1rem;
+}
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+nav ul li a:hover {
+  background: #1a2533;
+}
+nav ul.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+nav ul.menu li {
+  margin: 0 1rem;
+  position: relative;
+}
+nav ul.menu li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: inline-block;
+}
+nav ul.menu li a:hover, nav ul.menu li .dropbtn:hover {
+  background: #1a2533;
+}
+nav ul.menu li.dropdown {
+  cursor: pointer;
+}
+nav ul.menu li .dropdown-content {
+  display: none;
+  position: absolute;
+  background: #2d3e50;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  z-index: 1;
+  border-radius: 0 0 8px 8px;
+  top: 100%;
+  left: 0;
+}
+nav ul.menu li .dropdown-content a {
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: block;
+  border-radius: 0;
+}
+nav ul.menu li .dropdown-content a:hover {
+  background: #1a2533;
+}
+nav ul.menu li.dropdown:hover .dropdown-content {
+  display: block;
+}
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+}
+.welcome {
+  text-align: center;
+}
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  background: #2d3e50;
+  color: #fff;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+@media (max-width: 600px) {
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+  nav ul li {
+    margin: 0.5rem 0;
+  }
+  nav ul.menu {
+    flex-direction: column;
+    align-items: center;
+  }
+  nav ul.menu li {
+    margin: 0.5rem 0;
+  }
+  nav ul.menu li .dropdown-content {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 160px;
+  }
+  main {
+    padding: 1rem;
+  }
+} 

@@ -1,0 +1,1073 @@
+{
+	"info": {
+		"_postman_id": "88b1325f-0798-47f7-b282-75dbe6615ffe",
+		"name": "OFICINA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43982295"
+	},
+	"item": [
+		{
+			"name": "DIEGO - Buscar Todas Abertura Servico",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Buscar Abertura Servico ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico",
+						"7"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Erro campo basico",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"data\": \"2025-05-20\",\r\n  \"servicoId\": \"1\",\r\n  \"funcionarioId\": \"2\",\r\n  \"nomeCliente\": \"\",\r\n  \"cpfCliente\": \"060.325.145-96\",\r\n  \"veiculoId\": \"9\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO -  Delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico",
+						"10"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Criar Nova Ordem de servico",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Alterar a data para o dia atual\n{\n  \"data\": \"2025-05-23\",\n  \"servicoId\": \"10\",\n  \"funcionarioId\": \"10\",\n  \"nomeCliente\": \"Diego Ravani\",\n  \"cpfCliente\": \"060.325.145-96\",\n  \"veiculoId\": \"10\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO -  Regra 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// ALterar a data para o dia atual para testar a regra de négocio\n//Regra 01: limite de 10 ordens de serviços por dia\n{\n  \"data\": \"2025-05-23\",\n  \"servicoId\": \"6\",\n  \"funcionarioId\": \"10\",\n  \"nomeCliente\": \"Jonas\",\n  \"cpfCliente\": \"060.325.145-96\",\n  \"veiculoId\": \"7\"\n}\n\n// ALterar a data para o dia atual para testar a regra de négocio\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico/8",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico",
+						"8"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO -  Regra 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Alterar a data para o dia atual do body para testar a regra de negócio 02\n//Regra de negócio 02: o funcionário pode estar atribuido a apenas uma ordem de serviço no mesmo dia\n{\n  \"data\": \"2025-05-23\",\n  \"servicoId\": 1,\n  \"funcionarioId\": 1,\n  \"nomeCliente\": \"João Silva\",\n  \"cpfCliente\": \"123.456.789-00\",\n  \"veiculoId\": 2\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO -  Atualizacao",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"data\": \"2025-05-20\",\n  \"veiculoId\": 2,\n  \"servicoId\": 2,\n  \"funcionarioId\": 2\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/aberturaservico/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"aberturaservico",
+						"7"
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Relatorio_01 QTDE DE OS POR FUNCONARIO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/abertura-servico/relatorio/funcionarios?dataInicio=2025-05-01&dataFim=2025-06-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"abertura-servico",
+						"relatorio",
+						"funcionarios"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "2025-05-01"
+						},
+						{
+							"key": "dataFim",
+							"value": "2025-06-31"
+						}
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "DIEGO - Relatorio_02 SERVICOS MAIS PRESTADOS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/relatorio-servicos?dataInicio=2025-05-01&dataFim=2025-06-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"relatorio-servicos"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "2025-05-01"
+						},
+						{
+							"key": "dataFim",
+							"value": "2025-06-31"
+						}
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Listar Funcionarios",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/funcionarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Listar Funcionarios por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/funcionarios/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Cria Funcionario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"João Silva\",\r\n  \"cargo\": \"Mecânico Junior\",\r\n  \"cpf\": \"123.456.789-00\",\r\n  \"telefone\": \"(28) 98765-4321\",\r\n  \"dataDeAdmissao\": \"2025-04-11\",\r\n  \"especialidade\": \"Funilaria\",\r\n  \"salario\": 5000.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/funcionarios/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Cria Funcionario Erro",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"João Silva\",\r\n  \"cargo\": \"Mecânico Junior\",\r\n  \"cpf\": \"123.456.789-0\",\r\n  \"telefone\": \"(28) 98765-4321\",\r\n  \"dataDeAdmissao\": \"2025-04-11\",\r\n  \"especialidade\": \"Funilaria\",\r\n  \"salario\": 5000.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/funcionarios/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Atualiza Funcionario",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Silva Pereira\",\r\n    \"cargo\": \"Mecânico Sênior\",\r\n    \"cpf\": \"123.456.789-00\",\r\n    \"telefone\": \"(28) 98765-4321\",\r\n    \"dataDeAdmissao\": \"2025-04-11\",\r\n    \"especialidade\": \"Funilaria\",\r\n    \"salario\": 5000,\r\n    \"createdAt\": \"2025-04-24T14:17:26.212Z\",\r\n    \"updatedAt\": \"2025-04-24T14:17:26.212Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/funcionarios/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Excluir Funcionario",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/funcionarios/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"funcionarios",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Listar Veiculos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Listar Veiculos por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/veiculos/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Cria Veiculo",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Cria Veiculo Erro",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 5,\r\n    \"marca\": \"Ford\",\r\n    \"modelo\": \"Ka\",\r\n    \"ano\": 2015,\r\n    \"numeroChassi\": \"9BWZZZ377VT0\",\r\n    \"tipoCombustivel\": \"Gasolina\",\r\n    \"createdAt\": \"2025-04-24T02:01:39.679Z\",\r\n    \"updatedAt\": \"2025-04-24T02:01:39.679Z\",\r\n    \"clienteId\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Atualiza Veiculo",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"marca\": \"Ford\",\r\n    \"modelo\": \"Ka\",\r\n    \"ano\": 2012,\r\n    \"numeroChassi\": \"9BWZZZ377VT013029\",\r\n    \"tipoCombustivel\": \"Gás\",\r\n    \"createdAt\": \"2025-04-24T02:26:57.008Z\",\r\n    \"updatedAt\": \"2025-04-24T02:26:57.008Z\",\r\n    \"clienteId\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Excluir Veiculo",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/veiculos/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Listar Todas Execuções",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico"
+					]
+				},
+				"description": "Lista todas as execuções de serviço cadastradas no sistema, incluindo seus relacionamentos (forma de pagamento, abertura de serviço, etc)."
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Buscar Execução por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico",
+						"1"
+					]
+				},
+				"description": "Busca uma execução de serviço específica pelo seu ID, retornando todos os detalhes incluindo relacionamentos."
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Criar Nova Execução - Sem desconto",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"valor\": 150.50,\n    \"dataFinalizacao\": \"2024-03-20\",\n    \"formaPagamentoId\": 1,\n    \"aberturaServicoId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico"
+					]
+				},
+				"description": "Cria uma nova execução de serviço com os dados básicos. Este é um exemplo de criação simples sem ativar regras de negócio especiais."
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Criar Execução - Erro Validação",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"valor\": \"invalido\",\n    \"dataFinalizacao\": \"data-invalida\",\n    \"formaPagamentoId\": \"nao-numerico\",\n    \"aberturaServicoId\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico"
+					]
+				},
+				"description": "Testa as validações básicas dos campos:\n- valor: deve ser número\n- dataFinalizacao: deve ser data válida\n- formaPagamentoId: deve ser número\n- aberturaServicoId: não pode ser nulo"
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Criar Execução - Teste Forma Pagamento (Regra de Negócio 1)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"valor\": 150.50,\n    \"dataFinalizacao\": \"2024-03-20\",\n    \"formaPagamentoId\": 999,\n    \"aberturaServicoId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico"
+					]
+				},
+				"description": "Testa a Regra de Negócio 1: Validação de Forma de Pagamento\n- Tenta criar uma execução com uma forma de pagamento inexistente (id: 999)\n- Deve retornar erro indicando que a forma de pagamento não foi encontrada"
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Criar Execução - Com Desconto (Regra de Negócio 2)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"valor\": 200.00,\n    \"dataFinalizacao\": \"2024-03-20\",\n    \"formaPagamentoId\": 1,\n    \"aberturaServicoId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico"
+					]
+				},
+				"description": "Testa a Regra de Negócio 2: Desconto de Fidelidade\n- Cliente deve ter 2+ serviços no último mês para receber 10% de desconto\n- Resposta deve mostrar:\n  * valor: valor original (200.00)\n  * valorComDesconto: valor com 10% de desconto (180.00)"
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Atualizar Execução",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"valor\": 180.00,\n    \"dataFinalizacao\": \"2024-03-25\",\n    \"formaPagamentoId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico",
+						"1"
+					]
+				},
+				"description": "Atualiza uma execução de serviço existente.\n- O desconto é recalculado se o valor ou a data forem alterados\n- Resposta mostra valor original e valor com desconto (se aplicável)"
+			},
+			"response": []
+		},
+		{
+			"name": "JOAO VICTOR - Excluir Execução",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/ExecucaoServico/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"ExecucaoServico",
+						"1"
+					]
+				},
+				"description": "Remove uma execução de serviço do sistema. A operação falha se houver registros associados."
+			},
+			"response": []
+		},
+		{
+			"name": "MATHEUS - CADASTRAR NOVA PEÇA (POST)",
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Pastilha de Freio\",\n  \"codigo\": 123,\n  \"preco\": 99.90,\n  \"estoque\": 10\n}" },
+				"url": { "raw": "http://localhost:3333/pecas", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["pecas"] }
+			}
+		},
+		{
+			"name": "MATHEUS - LISTAR TODAS AS PEÇAS (GET)",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/pecas", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["pecas"] } }
+		},
+		{
+			"name": "MATHEUS - LISTAR PEÇA ESPECIFICA (GET)",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/pecas/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["pecas", "1"] } }
+		},
+		{
+			"name": "MATHEUS - EDITAR UMA PEÇA (UPDATE)",
+			"request": {
+				"method": "PUT",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Pastilha de Freio Premium\",\n  \"codigo\": 123,\n  \"preco\": 120.00,\n  \"estoque\": 8\n}" },
+				"url": { "raw": "http://localhost:3333/pecas/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["pecas", "1"] }
+			}
+		},
+		{
+			"name": "MATHEUS - EXCLUIR UMA PEÇA (DELETE)",
+			"request": { "method": "DELETE", "url": { "raw": "http://localhost:3333/pecas/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["pecas", "1"] } }
+		},
+		{
+			"name": "MATHEUS - RESERVAR PEÇA (POST)",
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"abertura_servico_id\": 1,\n  \"peca_id\": 1,\n  \"quantidade\": 2\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"] }
+			}
+		},
+		{
+			"name": "MATHEUS - LISTAR TODAS AS RESERVAS (GET)",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/reservas-peca", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"] } }
+		},
+		{
+			"name": "MATHEUS - LISTAR RESERVA ESPECIFICA (GET)",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/reservas-peca/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca", "1"] } }
+		},
+		{
+			"name": "MATHEUS - CADASTRAR UMA RESERVA (POST)",
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"abertura_servico_id\": 1,\n  \"peca_id\": 2,\n  \"quantidade\": 1\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"] }
+			}
+		},
+		{
+			"name": "MATHEUS - EDITAR UMA RESERVA (UPDATE)",
+			"request": {
+				"method": "PUT",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"quantidade\": 3\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca", "1"] }
+			}
+		},
+		{
+			"name": "MATHEUS - EXCLUIR UMA RESERVA (DELETE)",
+			"request": { "method": "DELETE", "url": { "raw": "http://localhost:3333/reservas-peca/1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca", "1"] } }
+		},
+		{
+			"name": "MATHEUS - REGRA 2 (POST) - NÃO PERMITIR MESMA PEÇA PARA MESMO SERVIÇO",
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"abertura_servico_id\": 1,\n  \"peca_id\": 1,\n  \"quantidade\": 1\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"] }
+			}
+		},
+		{
+			"name": "MATHEUS - REGRA 2 (GET) - LISTAR RESERVAS POR SERVIÇO",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/reservas-peca?abertura_servico_id=1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"], "query": [{"key": "abertura_servico_id", "value": "1"}] } }
+		},
+		{
+			"name": "MATHEUS - REGRA 2 (GET) - LISTAR RESERVAS POR PEÇA",
+			"request": { "method": "GET", "url": { "raw": "http://localhost:3333/reservas-peca?peca_id=1", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"], "query": [{"key": "peca_id", "value": "1"}] } }
+		},
+		{
+			"name": "MATHEUS - CADASTRAR REGRA 2 (POST)",
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"abertura_servico_id\": 2,\n  \"peca_id\": 1,\n  \"quantidade\": 1\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca"] }
+			}
+		},
+		{
+			"name": "MATHEUS - EDITAR REGRA 2 (UPDATE)",
+			"request": {
+				"method": "PUT",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\n  \"quantidade\": 2\n}" },
+				"url": { "raw": "http://localhost:3333/reservas-peca/2", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca", "2"] }
+			}
+		},
+		{
+			"name": "MATHEUS - EXCLUIR REGRA 2 (DELETE)",
+			"request": { "method": "DELETE", "url": { "raw": "http://localhost:3333/reservas-peca/2", "protocol": "http", "host": ["localhost"], "port": "3333", "path": ["reservas-peca", "2"] } }
+		}
+	]
+}
