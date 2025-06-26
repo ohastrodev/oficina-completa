@@ -1,6 +1,7 @@
 import { ReservaPeca } from '../models/ReservaPeca.js';
 import { Peca } from '../models/Peca.js';
 import { AberturaServico } from '../models/AberturaServico.js';
+import { Servico } from '../models/Servico.js';
 import { Op } from 'sequelize';
 import sequelize from '../config/database-connection.js';
 
@@ -28,14 +29,15 @@ export const ReservaPecaController = {
   async create(req, res) {
     try {
       const { abertura_servico_id, peca_id, quantidade } = req.body;
-      // Regra: Não pode reservar mais de 5 unidades da mesma peça para o mesmo serviço
-      const totalReservadas = await ReservaPeca.sum('quantidade', {
-        where: { abertura_servico_id, peca_id }
-      });
-      if ((totalReservadas || 0) + quantidade > 5) {
+      // Permitir apenas uma reserva por peça para cada ordem de serviço
+      const reservaExistente = await ReservaPeca.findOne({ where: { abertura_servico_id, peca_id } });
+      if (reservaExistente) {
+        return res.status(400).json({ error: 'Já existe uma reserva desta peça para este serviço! Edite a reserva existente.' });
+      }
+      if (quantidade > 5) {
         return res.status(400).json({ error: 'Não é possível reservar mais de 5 unidades desta peça para este serviço!' });
       }
-      // Regra 3: Não pode reservar mais peças do que o estoque disponível
+      // Regra: Não pode reservar mais peças do que o estoque disponível
       const peca = await Peca.findByPk(peca_id);
       if (!peca) return res.status(404).json({ error: 'Peça não encontrada!' });
       const totalReservadasDestaPeca = await ReservaPeca.sum('quantidade', {
@@ -58,15 +60,7 @@ export const ReservaPecaController = {
       const { quantidade } = req.body;
       const reserva = await ReservaPeca.findByPk(id);
       if (!reserva) return res.status(404).json({ error: 'Reserva não encontrada!' });
-      // Reaplicar as regras de negócio ao atualizar
-      const totalReservadas = await ReservaPeca.sum('quantidade', {
-        where: {
-          abertura_servico_id: reserva.abertura_servico_id,
-          peca_id: reserva.peca_id,
-          id: { [Op.ne]: id }
-        }
-      });
-      if ((totalReservadas || 0) + quantidade > 5) {
+      if (quantidade > 5) {
         return res.status(400).json({ error: 'Não é possível reservar mais de 5 unidades desta peça para este serviço!' });
       }
       const peca = await Peca.findByPk(reserva.peca_id);
@@ -146,6 +140,7 @@ export const ReservaPecaController = {
       if (!dataInicio || !dataFim) {
         return res.status(400).json({ error: 'As datas de início e fim são obrigatórias!' });
       }
+      // Buscar reservas agrupadas por abertura_servico_id
       const reservas = await ReservaPeca.findAll({
         include: [
           {
@@ -156,7 +151,7 @@ export const ReservaPecaController = {
               data: { [Op.between]: [dataInicio, dataFim] }
             },
             include: [{
-              model: require('../models/Servico.js').Servico,
+              model: Servico,
               as: 'servico',
               attributes: ['id', 'descricao']
             }]
@@ -166,7 +161,7 @@ export const ReservaPecaController = {
           'abertura_servico_id',
           [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalPecas']
         ],
-        group: ['servico.servico.id', 'servico.servico.descricao'],
+        group: ['abertura_servico_id', 'servico.id', 'servico.servico.id', 'servico.servico.descricao'],
         order: [[sequelize.fn('SUM', sequelize.col('quantidade')), 'DESC']]
       });
       const resultado = reservas.map(r => ({
