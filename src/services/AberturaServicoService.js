@@ -72,9 +72,7 @@ class AberturaServicoService {
 
       await t.commit();
 
-      return await AberturaServico.findByPk(novaOrdem.id, {
-        include: { all: true, nested: true }
-      });
+      return await this.findByPk({ params: { id: novaOrdem.id } });
 
     } catch (error) {
       await t.rollback();
