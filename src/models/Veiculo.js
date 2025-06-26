@@ -6,14 +6,11 @@ class Veiculo extends Model {
     super.init({
         cliente_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
                 model: 'clientes',
                 key: 'id'
             },
-            validate: {
-                notNull: { msg: "O cliente deve ser informado!" }
-            }
         },
         marca: { 
             type: DataTypes.STRING, 

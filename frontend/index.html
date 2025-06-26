@@ -5,50 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oficina Mecânica - Painel</title>
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Oficina Mecânica</h1>
-    <nav>
-      <ul class="menu">
-        <li><a href="#" data-section="funcionarios">Funcionários</a></li>
-        <li><a href="#" data-section="veiculos">Veículos</a></li>
-        <li><a href="#" data-section="servicos">Serviços</a></li>
-        <li><a href="#" data-section="pecas">Peças</a></li>
-        <li class="has-submenu">
-          <a href="#" id="processos-menu">Processos</a>
-          <ul class="submenu" id="processos-submenu">
-            <li class="menu-item" data-section="ordens">Abertura de OS</li>
-            <li class="menu-item" data-section="execucoes">Execução de Serviço</li>
-            <li class="menu-item" data-section="reservas">Reserva de Peça</li>
-          </ul>
-        </li>
-        <li class="has-submenu">
-          <a href="#" id="relatorios-menu">Relatórios</a>
-          <ul class="submenu" id="relatorios-submenu">
-            <li class="menu-item" data-section="relatorio-os-funcionario">OS por Funcionário</li>
-            <li class="menu-item" data-section="relatorio-servicos-mais">Serviços mais prestados</li>
-            <li class="menu-item" data-section="relatorio-pecas-mais">Peças mais reservadas</li>
-            <li class="menu-item" data-section="relatorio-servicos-pecas">Serviços com mais peças reservadas</li>
-            <li class="menu-item" data-section="relatorio-os-executadas">OS Executadas</li>
-            <li class="menu-item" data-section="relatorio-desempenho-func">Desempenho de Funcionário</li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <div id="app">
-      <section class="welcome">
-        <h2>Bem-vindo ao sistema da Oficina Mecânica!</h2>
-        <p>Escolha uma das opções acima para gerenciar os dados do sistema.</p>
-      </section>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i class="fa-solid fa-screwdriver-wrench fa-2x"></i>
+        <span>Oficina Mecânica</span>
+      </div>
+      <nav>
+        <ul class="menu-vertical">
+          <li><a href="#" data-section="funcionarios"><i class="fa-solid fa-users"></i> Funcionários</a></li>
+          <li><a href="#" data-section="veiculos"><i class="fa-solid fa-car"></i> Veículos</a></li>
+          <li><a href="#" data-section="servicos"><i class="fa-solid fa-gears"></i> Serviços</a></li>
+          <li><a href="#" data-section="pecas"><i class="fa-solid fa-cogs"></i> Peças</a></li>
+          <li class="has-submenu">
+            <a href="#" id="processos-menu"><i class="fa-solid fa-clipboard-list"></i> Processos <i class="fa-solid fa-chevron-down submenu-arrow"></i></a>
+            <ul class="submenu" id="processos-submenu">
+              <li class="menu-item" data-section="ordens"><i class="fa-solid fa-file-circle-plus"></i> Abertura de OS</li>
+              <li class="menu-item" data-section="execucoes"><i class="fa-solid fa-play"></i> Execução de Serviço</li>
+              <li class="menu-item" data-section="reservas"><i class="fa-solid fa-box"></i> Reserva de Peça</li>
+            </ul>
+          </li>
+          <li class="has-submenu">
+            <a href="#" id="relatorios-menu"><i class="fa-solid fa-chart-bar"></i> Relatórios <i class="fa-solid fa-chevron-down submenu-arrow"></i></a>
+            <ul class="submenu" id="relatorios-submenu">
+              <li class="menu-item" data-section="relatorio-os-funcionario"><i class="fa-solid fa-user-tie"></i> OS por Funcionário</li>
+              <li class="menu-item" data-section="relatorio-servicos-mais"><i class="fa-solid fa-star"></i> Serviços mais prestados</li>
+              <li class="menu-item" data-section="relatorio-pecas-mais"><i class="fa-solid fa-boxes-stacked"></i> Peças mais reservadas</li>
+              <li class="menu-item" data-section="relatorio-servicos-pecas"><i class="fa-solid fa-toolbox"></i> Serviços com mais peças reservadas</li>
+              <li class="menu-item" data-section="relatorio-os-executadas"><i class="fa-solid fa-check-double"></i> OS Executadas</li>
+              <li class="menu-item" data-section="relatorio-desempenho-func"><i class="fa-solid fa-chart-line"></i> Desempenho de Funcionário</li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="main-header">
+        <h1><i class="fa-solid fa-screwdriver-wrench"></i> Oficina Mecânica</h1>
+      </header>
+      <main>
+        <div id="app">
+          <section class="welcome">
+            <h2>Bem-vindo ao sistema da Oficina Mecânica!</h2>
+            <p>Escolha uma das opções ao lado para gerenciar os dados do sistema.</p>
+          </section>
+        </div>
+      </main>
+      <footer>
+        <p>&copy; 2024 Oficina Mecânica</p>
+      </footer>
     </div>
-  </main>
-  <footer>
-    <p>&copy; 2024 Oficina Mecânica</p>
-  </footer>
+  </div>
   <script src="js/app.js"></script>
 </body>
 </html> 

@@ -64,8 +64,8 @@ function maskCPF(value) {
 function maskTelefone(value) {
   return value
     .replace(/\D/g, '')
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+    .replace(/(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')
+    .replace(/(\d{2})(\d{4,5})$/, '($1) $2')
     .slice(0, 15);
 }
 
@@ -353,9 +353,13 @@ function veiculosController() {
         ano: document.getElementById('veic-ano').value,
         numeroChassi: document.getElementById('veic-numeroChassi').value,
         tipoCombustivel: document.getElementById('veic-tipoCombustivel').value,
-        placa: document.getElementById('veic-placa').value,
-        clienteId: null // sempre enviar clienteId, mesmo que não use
+        placa: document.getElementById('veic-placa').value
       };
+      // Só adiciona clienteId se existir
+      const clienteIdInput = document.getElementById('veic-cliente-id');
+      if (clienteIdInput && clienteIdInput.value) {
+        veiculo.clienteId = clienteIdInput.value;
+      }
       try {
         let resp;
         if (id) {
