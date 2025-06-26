@@ -25,36 +25,37 @@ class AberturaServicoService {
   }
 
   static async create(req) {
-    const {
-      data,
-      servicoId,
-      funcionarioId,
-      nomeCliente,
-      cpfCliente,
-      veiculoId
-    } = req.body;
+    // Aceita tanto camelCase quanto snake_case
+    const data = req.body.data;
+    const veiculoId = req.body.veiculo_id || req.body.veiculoId;
+    const servicoId = req.body.servico_id || req.body.servicoId;
+    const funcionarioId = req.body.funcionario_id || req.body.funcionarioId;
+    const nomeCliente = req.body.nomeCliente;
+    const cpfCliente = req.body.cpfCliente;
 
-    if (!data || !servicoId || !funcionarioId || !nomeCliente || !cpfCliente || !veiculoId) {
+    if (!data || !servicoId || !funcionarioId || !veiculoId) {
       throw 'Todos os campos são obrigatórios!';
     }
 
-    await this.verificarLimiteOrdemServico(req);
-    await this.verificarDisponibilidadeDoFuncionario(req);
-
+    await this.verificarLimiteOrdemServico({ body: { data } });
+    await this.verificarDisponibilidadeDoFuncionario({ body: { data, funcionarioId } });
 
     const t = await sequelize.transaction();
 
     try {
-      let cliente = await Cliente.findOne({
-        where: { cpf: cpfCliente },
-        transaction: t
-      });
-
-      if (!cliente) {
-        cliente = await Cliente.create({
-          nome: nomeCliente,
-          cpf: cpfCliente
-        }, { transaction: t });
+      // Só cria cliente se nomeCliente e cpfCliente forem enviados
+      let cliente = null;
+      if (nomeCliente && cpfCliente) {
+        cliente = await Cliente.findOne({
+          where: { cpf: cpfCliente },
+          transaction: t
+        });
+        if (!cliente) {
+          cliente = await Cliente.create({
+            nome: nomeCliente,
+            cpf: cpfCliente
+          }, { transaction: t });
+        }
       }
 
       const veiculo = await Veiculo.findByPk(veiculoId, { transaction: t });
@@ -64,8 +65,8 @@ class AberturaServicoService {
 
       const novaOrdem = await AberturaServico.create({
         data,
-        veiculoId: veiculo.id,
-        servicoId,
+        veiculo_id: veiculo.id,
+        servico_id: servicoId,
         funcionario_id: funcionarioId
       }, { transaction: t });
 

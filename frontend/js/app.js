@@ -1,5 +1,3 @@
-// SPA Oficina Mecânica - JS principal
-
 const BASE_URL = 'https://oficina-completa-backend-sequelize.onrender.com';
 const app = document.getElementById('app');
 
@@ -817,9 +815,9 @@ function ordensController() {
       const id = document.getElementById('ordem-id').value;
       const ordem = {
         data: document.getElementById('ordem-data').value,
-        funcionario_id: document.getElementById('ordem-funcionario').value,
-        veiculo_id: document.getElementById('ordem-veiculo').value,
-        servico_id: document.getElementById('ordem-servico').value
+        funcionarioId: document.getElementById('ordem-funcionario').value,
+        veiculoId: document.getElementById('ordem-veiculo').value,
+        servicoId: document.getElementById('ordem-servico').value
       };
       try {
         let resp;
