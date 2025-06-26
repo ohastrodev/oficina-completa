@@ -159,7 +159,6 @@ export const ReservaPecaController = {
         attributes: [
           [sequelize.col('servico.servico.id'), 'servicoId'],
           [sequelize.col('servico.servico.descricao'), 'descricaoServico'],
-          [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalPecas'],
           [sequelize.fn('COUNT', sequelize.col('ReservaPeca.id')), 'totalReservas']
         ],
         group: ['servico.servico.id', 'servico.servico.descricao'],
@@ -168,7 +167,6 @@ export const ReservaPecaController = {
       const resultado = reservas.map(r => ({
         servicoId: r.get('servicoId'),
         descricaoServico: r.get('descricaoServico'),
-        totalPecas: r.get('totalPecas'),
         totalReservas: r.get('totalReservas')
       }));
       res.json(resultado);
