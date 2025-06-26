@@ -1,5 +1,6 @@
 // SPA Oficina Mecânica - JS principal
 
+const BASE_URL = 'https://oficina-completa-backend-sequelize.onrender.com';
 const app = document.getElementById('app');
 
 // Rotas/Seções
@@ -68,7 +69,7 @@ function renderFuncionariosSection() {
 }
 
 function funcionariosController() {
-  const API_URL = 'http://localhost:3333/funcionarios';
+  const API_URL = `${BASE_URL}/funcionarios`;
   const tableBody = document.querySelector('#funcionarios-table tbody');
   const form = document.getElementById('funcionario-form');
   const formTitle = document.getElementById('form-title-func');
@@ -231,7 +232,7 @@ function renderVeiculosSection() {
 }
 
 function veiculosController() {
-  const API_URL = 'http://localhost:3333/veiculos';
+  const API_URL = `${BASE_URL}/veiculos`;
   const tableBody = document.querySelector('#veiculos-table tbody');
   const form = document.getElementById('veiculo-form');
   const formTitle = document.getElementById('form-title-veic');
@@ -385,7 +386,7 @@ function renderServicosSection() {
 }
 
 function servicosController() {
-  const API_URL = 'http://localhost:3333/servicos';
+  const API_URL = `${BASE_URL}/servicos`;
   const tableBody = document.querySelector('#servicos-table tbody');
   const form = document.getElementById('servico-form');
   const formTitle = document.getElementById('form-title-serv');
@@ -532,7 +533,7 @@ function renderPecasSection() {
 }
 
 function pecasController() {
-  const API_URL = 'http://localhost:3333/pecas';
+  const API_URL = `${BASE_URL}/pecas`;
   const tableBody = document.querySelector('#pecas-table tbody');
   const form = document.getElementById('peca-form');
   const formTitle = document.getElementById('form-title-peca');
