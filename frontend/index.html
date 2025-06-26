@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oficina Mecânica - Painel</title>
   <link rel="stylesheet" href="styles/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
@@ -15,13 +16,17 @@
         <li><a href="#" data-section="veiculos">Veículos</a></li>
         <li><a href="#" data-section="servicos">Serviços</a></li>
         <li><a href="#" data-section="pecas">Peças</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Processos</a>
-          <div class="dropdown-content">
-            <a href="#" data-section="ordens">Ordens de Serviço</a>
-            <a href="#" data-section="execucoes">Execuções de Serviço</a>
-            <a href="#" data-section="reservas">Reservas de Peça</a>
-          </div>
+        <li><a href="#" data-section="ordens">Processos</a></li>
+        <li>
+          <a href="#" id="relatorios-menu">Relatórios</a>
+          <ul class="submenu" id="relatorios-submenu">
+            <li class="menu-item" data-section="relatorio-os-funcionario">Relatório: OS por Funcionário</li>
+            <li class="menu-item" data-section="relatorio-servicos-mais">Relatório: Serviços mais prestados</li>
+            <li class="menu-item" data-section="relatorio-pecas-mais">Relatório: Peças mais reservadas</li>
+            <li class="menu-item" data-section="relatorio-servicos-pecas">Relatório: Serviços com mais peças reservadas</li>
+            <li class="menu-item" data-section="relatorio-os-executadas">Relatório: OS Executadas</li>
+            <li class="menu-item" data-section="relatorio-desempenho-func">Relatório: Desempenho de Funcionário</li>
+          </ul>
         </li>
       </ul>
     </nav>

@@ -82,5 +82,7 @@ routes.get('/reservas-peca/:id', ReservaPecaController.findByPk);
 routes.post('/reservas-peca', ReservaPecaController.create);
 routes.put('/reservas-peca/:id', ReservaPecaController.update);
 routes.delete('/reservas-peca/:id', ReservaPecaController.delete);
+routes.get('/reservas-peca/relatorio/mais-reservadas', ReservaPecaController.relatorioMaisReservadas);
+routes.get('/reservas-peca/relatorio/servicos-mais-pecas', ReservaPecaController.relatorioServicosMaisPecas);
 
 export default routes;

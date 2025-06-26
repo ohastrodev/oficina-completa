@@ -2,6 +2,7 @@ import { ReservaPeca } from '../models/ReservaPeca.js';
 import { Peca } from '../models/Peca.js';
 import { AberturaServico } from '../models/AberturaServico.js';
 import { Op } from 'sequelize';
+import { sequelize } from '../config/database.js';
 
 export const ReservaPecaController = {
   async findAll(req, res) {
@@ -98,6 +99,88 @@ export const ReservaPecaController = {
       res.json({ mensagem: 'Reserva excluída com sucesso!' });
     } catch (error) {
       res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Relatório: Peças mais reservadas no período
+  async relatorioMaisReservadas(req, res) {
+    try {
+      const { dataInicio, dataFim } = req.query;
+      if (!dataInicio || !dataFim) {
+        return res.status(400).json({ error: 'As datas de início e fim são obrigatórias!' });
+      }
+      const reservas = await ReservaPeca.findAll({
+        include: [
+          {
+            model: Peca,
+            as: 'peca',
+            attributes: ['id', 'nome']
+          },
+          {
+            model: AberturaServico,
+            as: 'servico',
+            attributes: [],
+            where: {
+              data: { [Op.between]: [dataInicio, dataFim] }
+            }
+          }
+        ],
+        attributes: [
+          'peca_id',
+          [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalReservada']
+        ],
+        group: ['peca_id', 'peca.id', 'peca.nome'],
+        order: [[sequelize.fn('SUM', sequelize.col('quantidade')), 'DESC']]
+      });
+      const resultado = reservas.map(r => ({
+        pecaId: r.peca_id,
+        nomePeca: r.peca?.nome || 'Desconhecida',
+        totalReservada: r.get('totalReservada')
+      }));
+      res.json(resultado);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // Relatório: Serviços com mais peças reservadas no período
+  async relatorioServicosMaisPecas(req, res) {
+    try {
+      const { dataInicio, dataFim } = req.query;
+      if (!dataInicio || !dataFim) {
+        return res.status(400).json({ error: 'As datas de início e fim são obrigatórias!' });
+      }
+      const reservas = await ReservaPeca.findAll({
+        include: [
+          {
+            model: AberturaServico,
+            as: 'servico',
+            attributes: ['id'],
+            where: {
+              data: { [Op.between]: [dataInicio, dataFim] }
+            },
+            include: [{
+              model: require('../models/Servico.js').Servico,
+              as: 'servico',
+              attributes: ['id', 'descricao']
+            }]
+          }
+        ],
+        attributes: [
+          'abertura_servico_id',
+          [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalPecas']
+        ],
+        group: ['servico.servico.id', 'servico.servico.descricao'],
+        order: [[sequelize.fn('SUM', sequelize.col('quantidade')), 'DESC']]
+      });
+      const resultado = reservas.map(r => ({
+        servicoId: r.servico?.servico?.id || null,
+        descricaoServico: r.servico?.servico?.descricao || 'Desconhecido',
+        totalPecas: r.get('totalPecas')
+      }));
+      res.json(resultado);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
 }; 

@@ -29,7 +29,13 @@ const sections = {
   pecas: renderPecasSection,
   ordens: renderOrdensSection,
   execucoes: renderExecucoesSection,
-  reservas: renderReservasSection
+  reservas: renderReservasSection,
+  'relatorio-os-funcionario': renderRelatorioOSFuncionario,
+  'relatorio-servicos-mais': renderRelatorioServicosMais,
+  'relatorio-pecas-mais': renderRelatorioPecasMais,
+  'relatorio-servicos-pecas': renderRelatorioServicosPecas,
+  'relatorio-os-executadas': renderRelatorioOSExecutadas,
+  'relatorio-desempenho-func': renderRelatorioDesempenhoFunc
 };
 
 // Menu click handler
@@ -1291,6 +1297,508 @@ function reservasController() {
   });
 
   carregarReservas();
+}
+
+// Relatórios SPA
+function renderRelatorioOSFuncionario() {
+  app.innerHTML = `
+    <section>
+      <h2>Ordens de Serviço por Funcionário</h2>
+      <form id="filtro-relatorio-os-funcionario">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-os-funcionario-tabela"></div>
+      <canvas id="relatorio-os-funcionario-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-os-funcionario').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${BASE_URL}/abertura-servico/relatorio/funcionarios?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaOSFuncionario(dados);
+      renderGraficoOSFuncionario(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaOSFuncionario(dados) {
+  const tabelaDiv = document.getElementById('relatorio-os-funcionario-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Funcionário</th><th>Qtd. Ordens</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr><td>${item.nomeFuncionario}</td><td>${item.totalOrdens}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartOSFuncionario;
+function renderGraficoOSFuncionario(dados) {
+  const ctx = document.getElementById('relatorio-os-funcionario-grafico').getContext('2d');
+  if (chartOSFuncionario) chartOSFuncionario.destroy();
+  chartOSFuncionario = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.nomeFuncionario),
+      datasets: [{
+        label: 'Qtd. Ordens',
+        data: dados.map(d => d.totalOrdens),
+        backgroundColor: 'rgba(255, 205, 0, 0.7)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderRelatorioServicosMais() {
+  app.innerHTML = `
+    <section>
+      <h2>Serviços mais prestados</h2>
+      <form id="filtro-relatorio-servicos-mais">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-servicos-mais-tabela"></div>
+      <canvas id="relatorio-servicos-mais-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-servicos-mais').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${API_URL}/relatorio-servicos?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaServicosMais(dados);
+      renderGraficoServicosMais(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaServicosMais(dados) {
+  const tabelaDiv = document.getElementById('relatorio-servicos-mais-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Serviço</th><th>Qtd. Prestada</th><th>Receita Total</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr><td>${item.descricaoServico}</td><td>${item.quantidadeServico}</td><td>R$ ${Number(item.receitaTotal).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartServicosMais;
+function renderGraficoServicosMais(dados) {
+  const ctx = document.getElementById('relatorio-servicos-mais-grafico').getContext('2d');
+  if (chartServicosMais) chartServicosMais.destroy();
+  chartServicosMais = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.descricaoServico),
+      datasets: [{
+        label: 'Qtd. Prestada',
+        data: dados.map(d => d.quantidadeServico),
+        backgroundColor: 'rgba(255, 205, 0, 0.7)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderRelatorioPecasMais() {
+  app.innerHTML = `
+    <section>
+      <h2>Peças mais reservadas</h2>
+      <form id="filtro-relatorio-pecas-mais">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-pecas-mais-tabela"></div>
+      <canvas id="relatorio-pecas-mais-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-pecas-mais').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${API_URL}/reservas-peca/relatorio/mais-reservadas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaPecasMais(dados);
+      renderGraficoPecasMais(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaPecasMais(dados) {
+  const tabelaDiv = document.getElementById('relatorio-pecas-mais-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Peça</th><th>Qtd. Reservada</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr><td>${item.nomePeca}</td><td>${item.totalReservada}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartPecasMais;
+function renderGraficoPecasMais(dados) {
+  const ctx = document.getElementById('relatorio-pecas-mais-grafico').getContext('2d');
+  if (chartPecasMais) chartPecasMais.destroy();
+  chartPecasMais = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.nomePeca),
+      datasets: [{
+        label: 'Qtd. Reservada',
+        data: dados.map(d => d.totalReservada),
+        backgroundColor: 'rgba(255, 205, 0, 0.7)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderRelatorioServicosPecas() {
+  app.innerHTML = `
+    <section>
+      <h2>Serviços com mais peças reservadas</h2>
+      <form id="filtro-relatorio-servicos-pecas">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-servicos-pecas-tabela"></div>
+      <canvas id="relatorio-servicos-pecas-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-servicos-pecas').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${API_URL}/reservas-peca/relatorio/servicos-mais-pecas?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaServicosPecas(dados);
+      renderGraficoServicosPecas(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaServicosPecas(dados) {
+  const tabelaDiv = document.getElementById('relatorio-servicos-pecas-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Serviço</th><th>Total de Peças Reservadas</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr><td>${item.descricaoServico}</td><td>${item.totalPecas}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartServicosPecas;
+function renderGraficoServicosPecas(dados) {
+  const ctx = document.getElementById('relatorio-servicos-pecas-grafico').getContext('2d');
+  if (chartServicosPecas) chartServicosPecas.destroy();
+  chartServicosPecas = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.descricaoServico),
+      datasets: [{
+        label: 'Total de Peças Reservadas',
+        data: dados.map(d => d.totalPecas),
+        backgroundColor: 'rgba(255, 205, 0, 0.7)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderRelatorioOSExecutadas() {
+  app.innerHTML = `
+    <section>
+      <h2>Ordens de Serviço Executadas</h2>
+      <form id="filtro-relatorio-os-executadas">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-os-executadas-tabela"></div>
+      <canvas id="relatorio-os-executadas-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-os-executadas').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${API_URL}/ExecucaoServico/relatorios/ordens?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaOSExecutadas(dados);
+      renderGraficoOSExecutadas(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaOSExecutadas(dados) {
+  const tabelaDiv = document.getElementById('relatorio-os-executadas-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Cliente</th><th>Veículo</th><th>Serviço</th><th>Valor</th><th>Data Abertura</th><th>Data Finalização</th><th>Responsável</th><th>Status</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr>
+      <td>${item.cliente.nome}</td>
+      <td>${item.veiculo.placa} - ${item.veiculo.modelo}</td>
+      <td>${item.servico.descricao}</td>
+      <td>R$ ${Number(item.valores.total).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+      <td>${item.datas.abertura}</td>
+      <td>${item.datas.finalizacao}</td>
+      <td>${item.responsavel.nome}</td>
+      <td>${item.ordem_servico.status}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartOSExecutadas;
+function renderGraficoOSExecutadas(dados) {
+  // Agrupar por data de finalização
+  const contagemPorDia = {};
+  for (const item of dados) {
+    const data = item.datas.finalizacao;
+    contagemPorDia[data] = (contagemPorDia[data] || 0) + 1;
+  }
+  const labels = Object.keys(contagemPorDia).sort((a,b)=>{
+    const [da,ma,aa]=a.split('/');
+    const [db,mb,ab]=b.split('/');
+    return new Date(aa,ma-1,da)-new Date(ab,mb-1,db);
+  });
+  const valores = labels.map(l => contagemPorDia[l]);
+  const ctx = document.getElementById('relatorio-os-executadas-grafico').getContext('2d');
+  if (chartOSExecutadas) chartOSExecutadas.destroy();
+  chartOSExecutadas = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'OS Executadas',
+        data: valores,
+        backgroundColor: 'rgba(255, 205, 0, 0.5)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderRelatorioDesempenhoFunc() {
+  app.innerHTML = `
+    <section>
+      <h2>Desempenho de Funcionário</h2>
+      <form id="filtro-relatorio-desempenho-func">
+        <label>De: <input type="date" id="data-inicio"></label>
+        <label>Até: <input type="date" id="data-fim"></label>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="relatorio-desempenho-func-tabela"></div>
+      <canvas id="relatorio-desempenho-func-grafico" style="max-width:600px;"></canvas>
+    </section>
+  `;
+
+  document.getElementById('filtro-relatorio-desempenho-func').onsubmit = async function(e) {
+    e.preventDefault();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    if (!dataInicio || !dataFim) {
+      alert('Selecione o período!');
+      return;
+    }
+    const url = `${API_URL}/ExecucaoServico/relatorios/desempenho?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Erro ao buscar relatório');
+      const dados = await resp.json();
+      renderTabelaDesempenhoFunc(dados);
+      renderGraficoDesempenhoFunc(dados);
+    } catch (err) {
+      alert('Erro ao buscar relatório: ' + err.message);
+    }
+  };
+}
+
+function renderTabelaDesempenhoFunc(dados) {
+  const tabelaDiv = document.getElementById('relatorio-desempenho-func-tabela');
+  if (!dados.length) {
+    tabelaDiv.innerHTML = '<p>Nenhum dado encontrado para o período.</p>';
+    return;
+  }
+  let html = '<table class="tabela-relatorio"><thead><tr><th>Funcionário</th><th>Cargo</th><th>Especialidade</th><th>Total Serviços</th><th>Concluídos</th><th>Tempo Médio (dias)</th><th>Taxa Conclusão</th><th>Eficiência</th><th>Valor Total</th></tr></thead><tbody>';
+  for (const item of dados) {
+    html += `<tr>
+      <td>${item.funcionario.nome}</td>
+      <td>${item.funcionario.cargo}</td>
+      <td>${item.funcionario.especialidade}</td>
+      <td>${item.indicadores.total_servicos}</td>
+      <td>${item.indicadores.servicos_concluidos}</td>
+      <td>${item.indicadores.tempo_medio_dias}</td>
+      <td>${item.indicadores.taxa_conclusao}</td>
+      <td>${item.indicadores.eficiencia}</td>
+      <td>R$ ${Number(item.indicadores.valor_total_servicos).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  tabelaDiv.innerHTML = html;
+}
+
+let chartDesempenhoFunc;
+function renderGraficoDesempenhoFunc(dados) {
+  const ctx = document.getElementById('relatorio-desempenho-func-grafico').getContext('2d');
+  if (chartDesempenhoFunc) chartDesempenhoFunc.destroy();
+  chartDesempenhoFunc = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.funcionario.nome),
+      datasets: [{
+        label: 'Eficiência (%)',
+        data: dados.map(d => parseFloat(d.indicadores.eficiencia)),
+        backgroundColor: 'rgba(255, 205, 0, 0.7)',
+        borderColor: 'rgba(0,0,0,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
 }
 
 // Inicialização
