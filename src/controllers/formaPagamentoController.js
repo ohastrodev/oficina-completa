@@ -1,34 +1,34 @@
 //DESENVOLVIDO POR DIEGO
-import { FormaPagamentoService } from "../services/FormaPagamentoService.js";
+import { formaPagamentoService } from "../services/formaPagamentoService.js";
 
 class FormaPagamentoController {
 
   static async findAll(req, res, next) {
-    FormaPagamentoService.findAll()
+    formaPagamentoService.findAll()
       .then(objs => res.json(objs))
       .catch(next);
   }
 
   static async findByPk(req, res, next) {
-    FormaPagamentoService.findByPk(req)
+    formaPagamentoService.findByPk(req)
       .then(obj => res.json(obj))
       .catch(next);
   }
 
   static async create(req, res, next) {
-    FormaPagamentoService.create(req)
+    formaPagamentoService.create(req)
       .then(obj => res.json(obj))
       .catch(next);
   }
 
   static async update(req, res, next) {
-    FormaPagamentoService.update(req)
+    formaPagamentoService.update(req)
       .then(obj => res.json(obj))
       .catch(next);
   }
 
   static async delete(req, res, next) {
-    FormaPagamentoService.delete(req)
+    formaPagamentoService.delete(req)
       .then(obj => res.json(obj))
       .catch(next);
   }
