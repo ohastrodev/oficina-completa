@@ -2,7 +2,7 @@ import { ReservaPeca } from '../models/ReservaPeca.js';
 import { Peca } from '../models/Peca.js';
 import { AberturaServico } from '../models/AberturaServico.js';
 import { Op } from 'sequelize';
-import { sequelize } from '../config/database.js';
+import sequelize from '../config/database-connection.js';
 
 export const ReservaPecaController = {
   async findAll(req, res) {
