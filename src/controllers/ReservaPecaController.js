@@ -140,7 +140,6 @@ export const ReservaPecaController = {
       if (!dataInicio || !dataFim) {
         return res.status(400).json({ error: 'As datas de início e fim são obrigatórias!' });
       }
-      // Buscar reservas agrupadas por abertura_servico_id
       const reservas = await ReservaPeca.findAll({
         include: [
           {
@@ -158,16 +157,19 @@ export const ReservaPecaController = {
           }
         ],
         attributes: [
-          'abertura_servico_id',
-          [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalPecas']
+          [sequelize.col('servico.servico.id'), 'servicoId'],
+          [sequelize.col('servico.servico.descricao'), 'descricaoServico'],
+          [sequelize.fn('SUM', sequelize.col('quantidade')), 'totalPecas'],
+          [sequelize.fn('COUNT', sequelize.col('ReservaPeca.id')), 'totalReservas']
         ],
-        group: ['abertura_servico_id', 'servico.id', 'servico.servico.id', 'servico.servico.descricao'],
-        order: [[sequelize.fn('SUM', sequelize.col('quantidade')), 'DESC']]
+        group: ['servico.servico.id', 'servico.servico.descricao'],
+        order: [[sequelize.fn('COUNT', sequelize.col('ReservaPeca.id')), 'DESC']]
       });
       const resultado = reservas.map(r => ({
-        servicoId: r.servico?.servico?.id || null,
-        descricaoServico: r.servico?.servico?.descricao || 'Desconhecido',
-        totalPecas: r.get('totalPecas')
+        servicoId: r.get('servicoId'),
+        descricaoServico: r.get('descricaoServico'),
+        totalPecas: r.get('totalPecas'),
+        totalReservas: r.get('totalReservas')
       }));
       res.json(resultado);
     } catch (error) {
